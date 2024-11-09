@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messaging</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .messaging-container {
+        display: flex;
+        height: 90vh;
+      }
+      .contact-list {
+        width: 25%;
+        padding: 20px;
+        border-right: 2px solid #ccc;
+      }
+      .conversation-area {
+        width: 75%;
+        padding: 20px;
+      }
+      .message-box {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .message-input {
+        width: 80%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-right: 10px;
+      }
+      .send-button {
+        padding: 10px 20px;
+        background-color: #4e7d16;
+        color: white;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+    <!-- Messaging Content -->
+    <div class="messaging-container">
+      <div class="contact-list">
+        <h2 class="text-2xl font-bold text-green-700">Contacts</h2>
+        <div id="contactList"></div>
+      </div>
+      <div class="conversation-area">
+        <h2 class="text-2xl font-bold text-green-700">Conversation</h2>
+        <div id="conversationArea" class="space-y-4"></div>
+        <div class="message-box">
+          <input
+            type="text"
+            id="messageInput"
+            class="message-input"
+            placeholder="Type a message..."
+          />
+          <button id="sendButton" class="send-button" onclick="sendMessage()">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+        set,
+        get,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Get the logged-in user's ID and role
+      const userId = localStorage.getItem("userUid");
+      const userRole = localStorage.getItem("userRole");
+
+      // Get the selected manager's ID from localStorage (from foodposts.html)
+      const selectedManagerId = localStorage.getItem("selectedManagerId");
+
+      let selectedContactId = selectedManagerId ? selectedManagerId : null;
+
+      //   let selectedContactId = null; // To track the selected contact
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // If there's a selected manager from foodposts.html, load the conversation
+        if (selectedManagerId) {
+          loadContactDetails(selectedManagerId);
+          loadConversation(selectedManagerId);
+        } else {
+          loadContactList(); // Load the contact list normally if no manager is pre-selected
+        }
+      });
+
+      // Load Contact Details for Selected Manager
+      function loadContactDetails(contactId) {
+        const contactList = document.getElementById("contactList");
+        contactList.innerHTML = ""; // Clear previous list
+
+        const userRef = ref(database, `users/${contactId}`);
+        onValue(userRef, (userSnapshot) => {
+          if (userSnapshot.exists()) {
+            const contactData = userSnapshot.val();
+            const contactName = contactData.name || "Unknown User"; // Display name or fallback to "Unknown User"
+
+            // Create a contact element for the selected contact
+            const contactElement = document.createElement("div");
+            contactElement.classList.add(
+              "contact-item",
+              "p-2",
+              "cursor-pointer",
+              "bg-gray-200",
+              "hover:bg-gray-300",
+              "rounded"
+            );
+            contactElement.textContent = contactName;
+            contactList.appendChild(contactElement);
+          }
+        });
+      }
+
+      // Updated Load Contact List function to display contact names
+      // Updated Load Contact List function to display unique contact names
+      function loadContactList() {
+        const contactList = document.getElementById("contactList");
+        contactList.innerHTML = ""; // Clear previous list
+
+        const messagesRef = ref(database, "messages");
+
+        onValue(messagesRef, (snapshot) => {
+          const contacts = new Set();
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const conversationId = childSnapshot.key;
+              const participants = conversationId.split("_");
+
+              if (participants.includes(userId)) {
+                const contactId =
+                  participants[0] === userId
+                    ? participants[1]
+                    : participants[0];
+                contacts.add(contactId);
+              }
+            });
+
+            // Clear the contact list to prevent duplicates
+            contactList.innerHTML = "";
+
+            // Fetch and display unique contact names
+            contacts.forEach((contactId) => {
+              const userRef = ref(database, `users/${contactId}`);
+              onValue(userRef, (userSnapshot) => {
+                if (userSnapshot.exists()) {
+                  const contactData = userSnapshot.val();
+                  const contactName = contactData.name || "Unknown User"; // Display name or fallback to "Unknown User"
+
+                  // Avoid duplicate contact entries
+                  if (!document.getElementById(`contact-${contactId}`)) {
+                    const contactElement = document.createElement("div");
+                    contactElement.classList.add(
+                      "contact-item",
+                      "p-2",
+                      "cursor-pointer",
+                      "bg-gray-200",
+                      "hover:bg-gray-300",
+                      "rounded"
+                    );
+                    contactElement.id = `contact-${contactId}`;
+                    contactElement.textContent = contactName;
+                    contactElement.onclick = () => {
+                      selectedContactId = contactId;
+                      localStorage.setItem("selectedContactId", contactId);
+                      loadConversation(contactId);
+                    };
+                    contactList.appendChild(contactElement);
+                  }
+                }
+              });
+            });
+          } else {
+            console.log("No messages found.");
+          }
+        });
+      }
+
+      // Load Conversation
+      // Load Conversation with improved debugging
+      function loadConversation(contactId) {
+        // selectedContactId = contactId;
+        const conversationId = [userId, contactId].sort().join("_");
+        console.log("Loading conversation with ID:", conversationId); // Debugging log
+        const conversationRef = ref(database, `messages/${conversationId}`);
+
+        onValue(conversationRef, (snapshot) => {
+          const conversationArea = document.getElementById("conversationArea");
+          conversationArea.innerHTML = ""; // Clear previous messages
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const messageData = childSnapshot.val();
+              const messageElement = document.createElement("div");
+              messageElement.classList.add(
+                messageData.senderId === userId
+                  ? "sent-message"
+                  : "received-message",
+                "p-2",
+                "mb-2",
+                messageData.senderId === userId
+                  ? "bg-blue-200"
+                  : "bg-green-200",
+                "rounded"
+              );
+              messageElement.textContent = `${messageData.message} (${new Date(
+                messageData.timestamp
+              ).toLocaleString()})`;
+              conversationArea.appendChild(messageElement);
+            });
+          } else {
+            console.log("No messages in this conversation.");
+          }
+        });
+      }
+
+      // Send Message
+      // Make the sendMessage function globally accessible
+      window.sendMessage = async function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const messageContent = messageInput.value.trim();
+
+        // Debugging log to check if message and contact ID are set properly
+        // console.log("Selected Contact ID:", selectedContactId);
+        // console.log("Message Content:", messageContent);
+
+        if (!messageContent || !selectedContactId) {
+          console.error("Missing message content or selected contact ID");
+          return;
+        }
+
+        const conversationId = [userId, selectedContactId].sort().join("_");
+        const messageRef = ref(database, `messages/${conversationId}`);
+        const newMessageRef = push(messageRef);
+
+        try {
+          await set(newMessageRef, {
+            senderId: userId,
+            receiverId: selectedContactId,
+            message: messageContent,
+            timestamp: new Date().toISOString(),
+          });
+          console.log("Message sent successfully");
+
+          // Clear input field after sending
+          messageInput.value = "";
+        } catch (error) {
+          console.error("Failed to send message:", error);
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        }
+      });
+    </script>
+    <script>
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>

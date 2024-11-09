@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Profile</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #f9f7cf, #dcedc1);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .profile-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .profile-section {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .profile-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      }
+      .section-title {
+        font-size: 1.8rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      .profile-detail {
+        font-size: 1.2rem;
+        color: #2d3748;
+      }
+      .btn-update-profile {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #87a330;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+      .btn-update-profile:hover {
+        background-color: #4e7d16;
+        transform: translateY(-2px);
+      }
+      .profile-container h1 {
+        font-size: 2rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 5px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .submit-btn {
+        margin-top: 30px;
+        width: 100%;
+        background-color: #87a330;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+      .submit-btn:hover {
+        background-color: #4e7d16;
+        transform: translateY(-3px);
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
+        Restaurant Manager Profile
+      </h1>
+
+      <form id="profile-form">
+        <!-- User Name (Display only) -->
+        <label for="user-name">Name</label>
+        <input type="text" id="user-name" disabled />
+
+        <!-- Restaurant Name -->
+        <label for="restaurant-name">Restaurant Name</label>
+        <input
+          type="text"
+          id="restaurant-name"
+          placeholder="Enter your restaurant name"
+          required
+        />
+
+        <!-- Contact Information -->
+        <label for="contact-number">Contact Number</label>
+        <input
+          type="tel"
+          id="contact-number"
+          placeholder="Enter your contact number"
+          required
+          pattern="[0-9]{10}"
+        />
+
+        <!-- Restaurant Location -->
+        <label for="restaurant-address">Restaurant Address</label>
+        <textarea
+          id="restaurant-address"
+          placeholder="Enter your restaurant address"
+          required
+        ></textarea>
+
+        <!-- Submit Button -->
+        <button type="button" class="submit-btn" onclick="saveProfile()">
+          Save Profile
+        </button>
+      </form>
+
+      <!-- Feedback Section -->
+      <div class="feedback-section mt-10">
+        <h2 class="text-2xl font-bold mb-4 text-green-700">Feedback Section</h2>
+        <div id="feedback-list" class="space-y-4">
+          <!-- Feedbacks will be dynamically loaded here -->
+          <p>No feedback available yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        update,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const auth = getAuth(app);
+
+      // Attach Firebase services to the window object for global access
+      window.firebaseApp = app;
+      window.database = database;
+      window.auth = auth;
+      window.ref = ref;
+      window.update = update;
+
+      // Fetch and display the current user's profile data
+      function loadProfile() {
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            const userUid = user.uid;
+            const dbRef = ref(database);
+            const snapshot = await get(child(dbRef, "users/" + userUid));
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              document.getElementById("user-name").value = userData.name || "";
+              document.getElementById("restaurant-name").value =
+                userData.restaurantName || "";
+              document.getElementById("contact-number").value =
+                userData.contactNumber || "";
+              document.getElementById("restaurant-address").value =
+                userData.restaurantAddress || "";
+            } else {
+              console.log("No data available");
+            }
+          } else {
+            // If no user is signed in, redirect to the login page
+            window.location.href = "index.html";
+          }
+        });
+      }
+
+      // Attach loadProfile to the window object for global access
+      window.loadProfile = loadProfile;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load the profile when the page loads
+        loadProfile();
+        loadFeedbacks();
+
+        // Load the appropriate navbar for the manager
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+      });
+
+      // Function to load feedback for the manager
+      // Function to load feedback for the manager
+      function loadFeedbacks() {
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            const userUid = user.uid; // Manager's UID
+            const feedbacksRef = ref(database, `feedbacks`);
+
+            try {
+              const snapshot = await get(feedbacksRef);
+              const feedbackListElement =
+                document.getElementById("feedback-list");
+
+              if (snapshot.exists()) {
+                feedbackListElement.innerHTML = ""; // Clear existing feedbacks
+                const feedbacks = snapshot.val();
+
+                // Filter feedbacks for the current manager
+                for (let feedbackId in feedbacks) {
+                  const feedbackItem = feedbacks[feedbackId];
+                  if (feedbackItem.managerId === userUid) {
+                    // Fetch volunteer details
+                    const volunteerId = feedbackItem.volunteerId;
+                    const volunteerRef = ref(database, `users/${volunteerId}`);
+                    const volunteerSnapshot = await get(volunteerRef);
+
+                    let volunteerName = "Unknown Volunteer";
+                    if (volunteerSnapshot.exists()) {
+                      const volunteerData = volunteerSnapshot.val();
+                      volunteerName = volunteerData.name || "Unknown Volunteer";
+                    }
+
+                    // Create a new div for each feedback item
+                    const feedbackDiv = document.createElement("div");
+                    feedbackDiv.classList.add(
+                      "p-4",
+                      "bg-white",
+                      "rounded-lg",
+                      "shadow-md"
+                    );
+
+                    feedbackDiv.innerHTML = `
+                <p class="font-semibold">"${feedbackItem.feedback}"</p>
+                <p class="text-sm text-gray-600">Item: ${
+                  feedbackItem.itemName
+                }</p>
+                <p class="text-sm text-gray-600">Rating: ${
+                  feedbackItem.rating ? feedbackItem.rating + "/5" : "N/A"
+                }</p>
+                <p class="text-sm text-gray-500">By: ${volunteerName}</p>
+                <p class="text-sm text-gray-400">Submitted On: ${new Date(
+                  feedbackItem.timestamp
+                ).toLocaleString()}</p>
+              `;
+                    feedbackListElement.appendChild(feedbackDiv);
+                  }
+                }
+
+                // If no feedbacks are available
+                if (feedbackListElement.innerHTML === "") {
+                  feedbackListElement.innerHTML =
+                    "<p>No feedback available yet.</p>";
+                }
+              } else {
+                feedbackListElement.innerHTML =
+                  "<p>No feedback available yet.</p>";
+              }
+            } catch (error) {
+              console.error("Error fetching feedbacks: ", error);
+              feedbackListElement.innerHTML =
+                "<p>Failed to load feedbacks.</p>";
+            }
+          }
+        });
+      }
+    </script>
+    <script>
+      // Function to save profile data to Firebase
+      function saveProfile() {
+        // Ensure `auth` and `database` are accessed from the global context
+        const auth = window.auth;
+        const database = window.database;
+
+        const restaurantName = document.getElementById("restaurant-name").value;
+        const contactNumber = document.getElementById("contact-number").value;
+        const restaurantAddress =
+          document.getElementById("restaurant-address").value;
+
+        // Check if user is authenticated
+        const user = auth.currentUser;
+        if (user) {
+          const userUid = user.uid;
+
+          // Update user's profile information in Firebase Database
+          const userRef = window.ref(database, "users/" + userUid);
+          window
+            .update(userRef, {
+              restaurantName: restaurantName,
+              contactNumber: contactNumber,
+              restaurantAddress: restaurantAddress,
+            })
+            .then(() => {
+              alert("Profile updated successfully!");
+            })
+            .catch((error) => {
+              console.error("Error updating profile: ", error);
+              alert("Failed to update profile. Please try again.");
+            });
+        } else {
+          // If no user is signed in, redirect to the login page
+          window.location.href = "index.html";
+        }
+      }
+
+      // Attach saveProfile to the window object for global access
+      window.saveProfile = saveProfile;
+
+      function signOut() {
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "managerSignup.html";
+      }
+    </script>
+  </body>
+</html>

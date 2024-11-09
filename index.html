@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Save Plate</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Adding fallback colors and improving color visibility */
+      body {
+        background: linear-gradient(to bottom, #dcedc1, #f9f7cf);
+      }
+      h1 {
+        color: #4e7d16;
+      }
+      .bg-green-custom {
+        background-color: #87a330;
+      }
+      .hover-bg-green-dark:hover {
+        background-color: #4e7d16;
+      }
+      .bg-teal-custom {
+        background-color: #cfe2b3;
+      }
+      .hover-bg-green-light:hover {
+        background-color: #a8c66c;
+      }
+      .plate-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .plate-title {
+        font-size: 2rem;
+        color: #4e7d16;
+        font-weight: bold;
+        position: relative;
+        z-index: 3;
+      }
+      .plate-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        border: 10px solid #a8c66c;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .plate-inner-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        border: 5px solid #87a330;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+      }
+      .plate-cutlery {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 350px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 0;
+      }
+      .plate-cutlery .fork,
+      .plate-cutlery .knife {
+        width: 20px;
+        height: 100px;
+        background-color: #4e7d16;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="plate-container">
+        <div class="plate-circle"></div>
+        <div class="plate-inner-circle"></div>
+        <span class="plate-title">Save Plate</span>
+        <div class="plate-cutlery">
+          <div class="fork"></div>
+          <div class="knife"></div>
+        </div>
+      </div>
+      <div class="space-y-5 mt-10">
+        <button
+          id="restaurantManagerButton"
+          class="w-full md:w-80 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all bg-green-custom hover-bg-green-dark"
+        >
+          Restaurant Manager
+        </button>
+        <button
+          id="volunteerButton"
+          class="w-full md:w-80 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all bg-teal-custom hover-bg-green-light"
+        >
+          Volunteer
+        </button>
+      </div>
+    </div>
+    <script>
+      // JavaScript for button redirection
+      document
+        .getElementById("restaurantManagerButton")
+        .addEventListener("click", function () {
+          window.location.href = "managerSignup.html";
+        });
+
+      document
+        .getElementById("volunteerButton")
+        .addEventListener("click", function () {
+          window.location.href = "volunteerSignup.html";
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Save Plate - Restaurant Manager Home</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a
+                href="managerHome.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="inventoryManagement.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Inventory Management</a
+              >
+            </li>
+            <li>
+              <a
+                href="food_posting.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Food Posting</a
+              >
+            </li>
+            <li>
+              <a
+                href="donation_requests.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Donation Requests</a
+              >
+            </li>
+            <li>
+              <a
+                href="waste_logging.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Waste Logging</a
+              >
+            </li>
+            <li>
+              <a
+                href="messaging.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Messaging</a
+              >
+            </li>
+            <li>
+              <a
+                href="profile.html"
+                class="py-2 px-4 rounded hover:bg-green-600"
+                >Profile</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <button
+          class="py-2 px-4 rounded bg-red-500 hover:bg-red-600"
+          onclick="signOut()"
+        >
+          Sign Out
+        </button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="container mx-auto p-8 main-content">
+      <h2 class="text-2xl font-semibold text-green-700 mb-6">
+        Welcome, Restaurant Manager!
+      </h2>
+      <p class="text-gray-700 mb-4">
+        Manage your inventory, post surplus food, handle donation requests, and
+        keep track of your waste logging and messaging—all from one place.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-700 mb-4">
+            Inventory Management
+          </h3>
+          <p class="text-gray-700 mb-4">
+            Track and manage your inventory effectively to minimize food waste.
+          </p>
+          <a
+            href="inventory_management.html"
+            class="text-green-600 hover:underline"
+          >
+            Go to Inventory Management &rarr;
+          </a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-700 mb-4">
+            Surplus Food Posting
+          </h3>
+          <p class="text-gray-700 mb-4">
+            Post details of surplus food available for donation.
+          </p>
+          <a href="food_posting.html" class="text-green-600 hover:underline">
+            Post Surplus Food &rarr;
+          </a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-700 mb-4">
+            Donation Requests
+          </h3>
+          <p class="text-gray-700 mb-4">
+            Manage requests for food donations and collaborate with volunteers.
+          </p>
+          <a
+            href="donation_requests.html"
+            class="text-green-600 hover:underline"
+          >
+            View Donation Requests &rarr;
+          </a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-700 mb-4">Waste Logging</h3>
+          <p class="text-gray-700 mb-4">
+            Log food waste and keep track of waste reduction initiatives.
+          </p>
+          <a href="waste_logging.html" class="text-green-600 hover:underline">
+            Log Waste &rarr;
+          </a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-700 mb-4">Messaging</h3>
+          <p class="text-gray-700 mb-4">
+            Communicate with volunteers and other restaurant managers for better
+            collaboration.
+          </p>
+          <a href="messaging.html" class="text-green-600 hover:underline">
+            Open Messaging &rarr;
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      function signOut() {
+        alert("You have signed out.");
+        window.location.href = "managerSignup.html";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Food Posting</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+        remove,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      window.foodPosts = [];
+
+      // Function to fetch all food posts from Firebase
+      window.getFoodPostsFromFirebase = function getFoodPostsFromFirebase() {
+        const dbRef = ref(db);
+        get(child(dbRef, `foodPosts`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              window.foodPosts = [];
+              snapshot.forEach((childSnapshot) => {
+                const item = childSnapshot.val();
+                item.id = childSnapshot.key;
+                window.foodPosts.push(item);
+              });
+              renderFoodPosts();
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching food posts: ", error);
+          });
+      };
+
+      // Function to delete a food post from Firebase
+      window.deleteFoodPostFromFirebase =
+        async function deleteFoodPostFromFirebase(postId) {
+          try {
+            const postRef = ref(db, `foodPosts/${postId}`);
+            await remove(postRef);
+            alert("Food post deleted successfully.");
+
+            // Update local array by removing the deleted item
+            window.foodPosts = window.foodPosts.filter(
+              (item) => item.id !== postId
+            );
+
+            // Re-render the list without refreshing the page
+            renderFoodPosts();
+          } catch (error) {
+            console.error("Error deleting food post: ", error);
+            alert("Error deleting food post. Please try again.");
+          }
+        };
+
+      // Initial rendering of the food posts
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load navbar
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+
+        getFoodPostsFromFirebase();
+      });
+    </script>
+    <script>
+      // Function to render food posts in the table
+      function renderFoodPosts() {
+        const table = document.getElementById("foodPostsTable");
+        table.innerHTML = "";
+
+        window.foodPosts.forEach((item) => {
+          // Only render food posts that are not marked as "donated"
+          if (item.status !== "donated") {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="border px-6 py-6 bg-gradient-to-br from-green-200 via-green-300 to-green-400 text-gray-900 font-semibold rounded-l-lg shadow-lg">${item.name}</td>
+              <td class="border px-6 py-6 bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400 text-gray-900 font-semibold shadow-lg">${item.quantity}</td>
+              <td class="border px-6 py-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 text-gray-900 font-semibold shadow-lg">${item.expiryDate}</td>
+              <td class="border px-6 py-6 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 rounded-r-lg shadow-lg">
+                <div class="flex space-x-3">
+                  <button onclick="deleteFoodPostFromFirebase('${item.id}')" class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Remove Post</button>
+                </div>
+              </td>
+            `;
+            table.appendChild(row);
+          }
+        });
+      }
+
+      // Function to handle sign out
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+    <style>
+      body {
+        background: linear-gradient(to bottom, #7bc977, #f0f7c3);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .btn {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      #foodPostsTable {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        width: 100%;
+      }
+      th {
+        background: #6ea83b;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 10px 10px 0 0;
+      }
+      td {
+        background: #e8f5e9;
+        padding: 20px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Food Posts Table -->
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-semibold text-gray-800">Food Posting</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-lg">
+          <thead>
+            <tr class="bg-gradient-to-r from-green-500 to-green-700 text-white">
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Item Name
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Quantity
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Expiry Date
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="foodPostsTable">
+            <!-- Food posts will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waste Logging</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(to bottom, #f9f7cf, #dcedc1);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .btn-log-waste {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #87a330;
+        color: white;
+      }
+      .btn-log-waste:hover {
+        background-color: #4e7d16;
+        transform: translateY(-2px);
+      }
+      table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <div class="container mx-auto py-8">
+      <h1 class="text-3xl font-bold mb-4 text-green-700">Waste Logging</h1>
+      <p class="mb-6">
+        Log discarded food items by recording quantities and reasons for
+        disposal.
+      </p>
+
+      <form id="waste-log-form" onsubmit="logWaste(event)" class="space-y-6">
+        <label for="item_id" class="block text-sm font-medium text-gray-700"
+          >Select Item</label
+        >
+        <select
+          id="item_id"
+          name="item_id"
+          class="w-full p-2 border rounded"
+          required
+        >
+          <option value="">Select an item</option>
+        </select>
+
+        <label for="quantity" class="block text-sm font-medium text-gray-700"
+          >Quantity</label
+        >
+        <input
+          type="number"
+          step="0.01"
+          id="quantity"
+          name="quantity"
+          class="w-full p-2 border rounded"
+          required
+        />
+
+        <label for="reason" class="block text-sm font-medium text-gray-700"
+          >Reason for Disposal</label
+        >
+        <textarea
+          id="reason"
+          name="reason"
+          class="w-full p-2 border rounded"
+          required
+        ></textarea>
+
+        <button type="submit" class="btn-log-waste px-6 py-2 rounded">
+          + Log Waste
+        </button>
+      </form>
+
+      <h2 class="text-2xl font-semibold mt-10 mb-4">Historical Waste Logs</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-lg waste-log-table">
+          <thead>
+            <tr class="bg-gradient-to-r from-green-500 to-green-700 text-white">
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Reason</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="waste-log-entries">
+            <!-- Waste log entries will be dynamically rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      push,
+      set,
+      get,
+      child,
+      remove,
+      onValue,
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+      authDomain: "saveplate-c246d.firebaseapp.com",
+      projectId: "saveplate-c246d",
+      storageBucket: "saveplate-c246d.firebasestorage.app",
+      messagingSenderId: "120081276324",
+      appId: "1:120081276324:web:16985cfc7662a80502b531",
+      measurementId: "G-75P3TNTKK7",
+      databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Fetch inventory items for the dropdown
+    window.getInventoryItems = function getInventoryItems() {
+      const dbRef = ref(db);
+      get(child(dbRef, `inventory`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const selectElement = document.getElementById("item_id");
+            snapshot.forEach((childSnapshot) => {
+              const item = childSnapshot.val();
+              const option = document.createElement("option");
+              option.value = childSnapshot.key;
+              option.textContent = `${item.name} (Quantity: ${item.quantity})`;
+              selectElement.appendChild(option);
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching inventory items: ", error);
+        });
+    };
+
+    // Function to log waste into Firebase
+    // Function to log waste into Firebase and update the inventory
+    window.logWaste = async function logWaste(event) {
+      event.preventDefault(); // Prevent form submission from reloading the page
+      const itemId = document.getElementById("item_id").value;
+      const quantity = parseFloat(document.getElementById("quantity").value);
+      const reason = document.getElementById("reason").value;
+
+      if (itemId && quantity && reason) {
+        try {
+          // Retrieve the selected item name from the dropdown
+          const itemElement = document.getElementById("item_id");
+          const itemName =
+            itemElement.options[itemElement.selectedIndex].text.split(
+              " (Quantity:"
+            )[0];
+
+          // Log waste to "wasteLogs" in Firebase
+          const wasteLogRef = ref(db, "wasteLogs");
+          const newWasteLogRef = push(wasteLogRef);
+          const currentDate = new Date().toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+
+          await set(newWasteLogRef, {
+            item_id: itemId,
+            item_name: itemName,
+            quantity: quantity,
+            reason: reason,
+            date_logged: currentDate,
+          });
+
+          // Update inventory quantity in Firebase
+          const inventoryItemRef = ref(db, `inventory/${itemId}`);
+          const inventorySnapshot = await get(inventoryItemRef);
+
+          if (inventorySnapshot.exists()) {
+            const currentQuantity = parseFloat(
+              inventorySnapshot.val().quantity
+            );
+
+            // Ensure inventory quantity doesn't become negative
+            if (quantity > currentQuantity) {
+              alert("Error: Quantity to log exceeds available inventory.");
+              return;
+            }
+
+            const newQuantity = currentQuantity - quantity;
+
+            await set(inventoryItemRef, {
+              ...inventorySnapshot.val(),
+              quantity: newQuantity,
+            });
+          }
+
+          // Refresh waste logs and reset form fields
+          getWasteLogs();
+          document.getElementById("waste-log-form").reset();
+
+          alert("Waste logged successfully and inventory updated.");
+        } catch (error) {
+          console.error("Error logging waste or updating inventory: ", error);
+          alert("Failed to log waste. Please try again.");
+        }
+      }
+    };
+
+    // Fetch waste logs from Firebase
+    window.getWasteLogs = function getWasteLogs() {
+      const dbRef = ref(db, "wasteLogs");
+      onValue(dbRef, (snapshot) => {
+        const tableBody = document.getElementById("waste-log-entries");
+        tableBody.innerHTML = ""; // Clear current entries
+
+        if (snapshot.exists()) {
+          snapshot.forEach((childSnapshot) => {
+            const log = childSnapshot.val();
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+              <td class="border px-6 py-4">${log.item_name}</td>
+              <td class="border px-6 py-4">${log.quantity}</td>
+              <td class="border px-6 py-4">${log.reason}</td>
+              <td class="border px-6 py-4">${log.date_logged}</td>
+              <td class="border px-6 py-4">
+                <button class="btn-delete bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded" onclick="deleteWasteLog('${childSnapshot.key}')">
+                  Delete
+                </button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+        } else {
+          // Show a message if no logs are found
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center py-4">No waste logs available.</td>
+            </tr>
+          `;
+        }
+      });
+    };
+
+    // Function to delete a waste log from Firebase
+    window.deleteWasteLog = async function deleteWasteLog(logId) {
+      try {
+        const logRef = ref(db, `wasteLogs/${logId}`);
+        await remove(logRef);
+        alert("Waste log deleted successfully.");
+        getWasteLogs(); // Refresh logs after deletion
+      } catch (error) {
+        console.error("Error deleting waste log: ", error);
+        alert("Error deleting waste log. Please try again.");
+      }
+    };
+
+    // Initial rendering of the inventory and waste logs
+    document.addEventListener("DOMContentLoaded", function () {
+      // Load navbar
+      const userRole = localStorage.getItem("userRole");
+
+      if (userRole === "Restaurant Manager") {
+        fetch("managerNavbar.html")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("navbar-container").innerHTML = data;
+          });
+      } else if (userRole === "Volunteer") {
+        fetch("volunteerNavbar.html")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("navbar-container").innerHTML = data;
+          });
+      }
+
+      // Load inventory items and waste logs
+      getInventoryItems();
+      getWasteLogs();
+    });
+  </script>
+  <script>
+    function signOut() {
+      localStorage.clear();
+      alert("You have been signed out.");
+      window.location.href = "index.html";
+    }
+  </script>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Save Plate</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <nav>
+          <ul id="navbar" class="flex space-x-4">
+            <!-- Links will be dynamically added based on user role -->
+          </ul>
+        </nav>
+        <button
+          id="signout-button"
+          class="py-2 px-4 rounded bg-red-500 hover:bg-red-600"
+        >
+          Sign Out
+        </button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="container mx-auto py-8">
+      <div id="content">
+        <!-- Dynamic content will be added here -->
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Mock user session data
+        const session = {
+          role: "Restaurant Manager", // Change this value to "Volunteer" for Volunteer view
+        };
+
+        const navbar = document.getElementById("navbar");
+        const content = document.getElementById("content");
+
+        if (session.role === "Restaurant Manager") {
+          // Add links for Restaurant Manager
+          navbar.innerHTML = `
+            <li><a href="restaurant_home.html" class="py-2 px-4 rounded hover:bg-green-600">Home</a></li>
+            <li><a href="inventory_management.html" class="py-2 px-4 rounded hover:bg-green-600">Inventory Management</a></li>
+            <li><a href="food_posting.html" class="py-2 px-4 rounded hover:bg-green-600">Food Posting</a></li>
+            <li><a href="donation_requests.html" class="py-2 px-4 rounded hover:bg-green-600">Donation Requests</a></li>
+            <li><a href="waste_logging.html" class="py-2 px-4 rounded hover:bg-green-600">Waste Logging</a></li>
+            <li><a href="messaging.html" class="py-2 px-4 rounded hover:bg-green-600">Messaging</a></li>
+            <li><a href="profile.html" class="py-2 px-4 rounded hover:bg-green-600">Profile</a></li>
+          `;
+        } else if (session.role === "Volunteer") {
+          // Add links for Volunteer
+          navbar.innerHTML = `
+            <li><a href="volunteer_home.html" class="py-2 px-4 rounded hover:bg-green-600">Home</a></li>
+            <li><a href="food_posts.html" class="py-2 px-4 rounded hover:bg-green-600">Food Posts</a></li>
+            <li><a href="feedback.html" class="py-2 px-4 rounded hover:bg-green-600">Feedback / Ratings</a></li>
+            <li><a href="pickup_schedule.html" class="py-2 px-4 rounded hover:bg-green-600">Pickup Schedule</a></li>
+            <li><a href="notification_settings.html" class="py-2 px-4 rounded hover:bg-green-600">Notification Settings</a></li>
+            <li><a href="messaging.html" class="py-2 px-4 rounded hover:bg-green-600">Messaging</a></li>
+            <li><a href="profile.html" class="py-2 px-4 rounded hover:bg-green-600">Profile</a></li>
+          `;
+        }
+
+        // Sign out button functionality
+        const signoutButton = document.getElementById("signout-button");
+        signoutButton.addEventListener("click", function () {
+          alert("You have signed out.");
+          window.location.href = "index.html"; // Redirect to index page
+        });
+      });
+    </script>
+  </body>
+</html>

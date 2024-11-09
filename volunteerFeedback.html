@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volunteer Feedback</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .feedback-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .submit-button {
+        background-color: #4e7d16;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+      .submit-button:hover {
+        background-color: #3b6b14;
+        transform: translateY(-3px);
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <div class="feedback-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
+        Submit Feedback
+      </h1>
+      <form id="feedbackForm">
+        <p class="text-lg font-semibold mb-4">
+          Manager Name: <span id="managerName"></span>
+        </p>
+        <p class="text-lg font-semibold mb-4">
+          Item Picked Up: <span id="itemName"></span>
+        </p>
+
+        <label for="feedback" class="block text-lg font-semibold mb-2"
+          >Your Feedback:</label
+        >
+        <textarea
+          id="feedback"
+          class="w-full p-2 border border-gray-300 rounded mb-4"
+          rows="4"
+          required
+        ></textarea>
+
+        <button type="submit" class="submit-button">Submit Feedback</button>
+      </form>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+        set,
+        get,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const managerId = localStorage.getItem("feedbackManagerId");
+        const itemName = localStorage.getItem("feedbackItemName");
+
+        // Set manager name and item name in the form
+        document.getElementById("itemName").textContent = itemName;
+
+        if (managerId) {
+          const userRef = ref(database, `users/${managerId}`);
+          get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+              const managerData = snapshot.val();
+              document.getElementById("managerName").textContent =
+                managerData.name || "Unknown Manager";
+            } else {
+              document.getElementById("managerName").textContent =
+                "Unknown Manager";
+            }
+          });
+        }
+
+        // Handle form submission
+        document
+          .getElementById("feedbackForm")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const feedbackText = document.getElementById("feedback").value;
+            const feedbackRef = ref(database, "feedbacks");
+            const newFeedbackRef = push(feedbackRef);
+
+            await set(newFeedbackRef, {
+              volunteerId: localStorage.getItem("userUid"),
+              managerId: managerId,
+              itemName: itemName,
+              feedback: feedbackText,
+              timestamp: new Date().toISOString(),
+            });
+
+            alert("Feedback submitted successfully!");
+
+            // Clear feedback data from local storage
+            localStorage.removeItem("feedbackManagerId");
+            localStorage.removeItem("feedbackItemName");
+
+            // Redirect to pickup schedule or home page
+            window.location.href = "pickupSchedule.html";
+          });
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        }
+      });
+    </script>
+  </body>
+</html>

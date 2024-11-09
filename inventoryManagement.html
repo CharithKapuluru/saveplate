@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory Management</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+        set,
+        get,
+        child,
+        update,
+        remove,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      window.db = getDatabase(app);
+      window.ref = ref;
+      window.push = push;
+      window.set = set;
+      window.get = get;
+      window.child = child;
+      window.update = update;
+      window.remove = remove;
+
+      window.inventory = [];
+
+      // CRUD Functions for Firebase
+      window.addItemToFirebase = async function addItemToFirebase(item) {
+        const inventoryRef = ref(db, "inventory");
+        const newItemRef = push(inventoryRef);
+        await set(newItemRef, item);
+        getInventoryFromFirebase();
+      };
+
+      window.editItemInFirebase = async function editItemInFirebase(
+        itemId,
+        updatedItem
+      ) {
+        const itemRef = ref(db, `inventory/${itemId}`);
+        await update(itemRef, updatedItem);
+        getInventoryFromFirebase();
+      };
+
+      window.deleteItemFromFirebase = async function deleteItemFromFirebase(
+        itemId
+      ) {
+        const itemRef = ref(db, `inventory/${itemId}`);
+        await remove(itemRef);
+        getInventoryFromFirebase();
+      };
+
+      window.postItemToFirebase = async function postItemToFirebase(
+        item,
+        postQuantity
+      ) {
+        const userUid = localStorage.getItem("userUid"); // Get the manager's unique ID
+        // Ensure the userUid is available
+        if (!userUid) {
+          alert("Unable to retrieve user ID. Please log in again.");
+          return;
+        }
+
+        const foodPostsRef = ref(db, "foodPosts");
+        const newFoodPostRef = push(foodPostsRef);
+
+        await set(newFoodPostRef, {
+          name: item.name,
+          quantity: postQuantity,
+          expiryDate: item.expiryDate,
+          status: "available",
+          managerId: userUid, // Add managerId to track the post
+        });
+
+        alert(
+          `Successfully posted ${postQuantity} of ${item.name} for donation.`
+        );
+      };
+
+      window.getInventoryFromFirebase = function getInventoryFromFirebase() {
+        const dbRef = ref(db);
+        get(child(dbRef, `inventory`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            window.inventory = [];
+            snapshot.forEach((childSnapshot) => {
+              const item = childSnapshot.val();
+              item.id = childSnapshot.key;
+              window.inventory.push(item);
+            });
+            renderInventory();
+          }
+        });
+      };
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load navbar
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+
+        getInventoryFromFirebase();
+
+        // Assign event listener to 'Add New Item' button
+        document
+          .getElementById("addItemButton")
+          .addEventListener("click", showAddItemPopup);
+      });
+    </script>
+    <script>
+      function renderInventory() {
+        const table = document.getElementById("inventoryTable");
+        table.innerHTML = "";
+
+        window.inventory.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="border px-6 py-6 bg-gradient-to-br from-green-200 via-green-300 to-green-400 text-gray-900 font-semibold rounded-l-lg shadow-lg">${item.name}</td>
+            <td class="border px-6 py-6 bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400 text-gray-900 font-semibold shadow-lg">${item.quantity}</td>
+            <td class="border px-6 py-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 text-gray-900 font-semibold shadow-lg">${item.expiryDate}</td>
+            <td class="border px-6 py-6 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 rounded-r-lg shadow-lg">
+              <div class="flex space-x-3">
+                <button id="edit-${item.id}" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Edit</button>
+                <button id="delete-${item.id}" class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Delete</button>
+                <button id="post-${item.id}" class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Post</button>
+              </div>
+            </td>
+          `;
+          table.appendChild(row);
+
+          // Add event listeners to buttons after they've been appended to the DOM
+          document
+            .getElementById(`edit-${item.id}`)
+            .addEventListener("click", () => editItem(item.id));
+          document
+            .getElementById(`delete-${item.id}`)
+            .addEventListener("click", () => deleteItem(item.id));
+          document
+            .getElementById(`post-${item.id}`)
+            .addEventListener("click", () => postItem(item.id));
+        });
+      }
+
+      function showAddItemPopup() {
+        // Clear previous input values
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemQuantity").value = "";
+        document.getElementById("itemExpiryDate").value = "";
+
+        // Remove previous click listeners
+        const saveButton = document.getElementById("saveItemButton");
+        saveButton.onclick = null;
+
+        // Set onclick to add a new item
+        saveButton.onclick = addItem;
+
+        // Show the popup
+        document.getElementById("addItemPopup").classList.remove("hidden");
+      }
+
+      function closeAddItemPopup() {
+        document.getElementById("addItemPopup").classList.add("hidden");
+      }
+
+      function addItem() {
+        const itemName = document.getElementById("itemName").value;
+        const itemQuantity = document.getElementById("itemQuantity").value;
+        const itemExpiryDate = document.getElementById("itemExpiryDate").value;
+
+        if (itemName && itemQuantity && itemExpiryDate) {
+          addItemToFirebase({
+            name: itemName,
+            quantity: parseInt(itemQuantity),
+            expiryDate: itemExpiryDate,
+          }).then(() => {
+            closeAddItemPopup();
+          });
+        }
+      }
+
+      function editItem(itemId) {
+        const item = window.inventory.find((inv) => inv.id === itemId);
+
+        // Set values in the popup
+        document.getElementById("itemName").value = item.name;
+        document.getElementById("itemQuantity").value = item.quantity;
+        document.getElementById("itemExpiryDate").value = item.expiryDate;
+
+        // Show the popup
+        document.getElementById("addItemPopup").classList.remove("hidden");
+
+        // Update the save button to handle editing
+        const saveButton = document.getElementById("saveItemButton");
+        saveButton.onclick = function () {
+          updateItemInFirebase(itemId);
+        };
+      }
+
+      function updateItemInFirebase(itemId) {
+        const updatedName = document.getElementById("itemName").value;
+        const updatedQuantity = document.getElementById("itemQuantity").value;
+        const updatedExpiryDate =
+          document.getElementById("itemExpiryDate").value;
+
+        if (updatedName && updatedQuantity && updatedExpiryDate) {
+          editItemInFirebase(itemId, {
+            name: updatedName,
+            quantity: parseInt(updatedQuantity),
+            expiryDate: updatedExpiryDate,
+          }).then(() => {
+            closeAddItemPopup();
+          });
+        }
+      }
+
+      function deleteItem(itemId) {
+        if (confirm("Are you sure you want to delete this item?")) {
+          deleteItemFromFirebase(itemId);
+        }
+      }
+
+      function postItem(itemId) {
+        const item = window.inventory.find((inv) => inv.id === itemId);
+
+        // Set itemId globally to use in the confirmPost function
+        window.currentPostItemId = itemId;
+        window.currentPostItem = item;
+
+        // Clear previous input value
+        document.getElementById("postQuantity").value = "";
+
+        // Show the post item popup
+        document.getElementById("postItemPopup").classList.remove("hidden");
+      }
+
+      function closePostItemPopup() {
+        document.getElementById("postItemPopup").classList.add("hidden");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load inventory after DOM is fully loaded
+        getInventoryFromFirebase();
+
+        // Assign event listener to 'Add New Item' button
+        document
+          .getElementById("addItemButton")
+          .addEventListener("click", showAddItemPopup);
+
+        // Assign event listener to confirmPostButton after the DOM is loaded
+        const confirmPostButton = document.getElementById("confirmPostButton");
+        if (confirmPostButton) {
+          confirmPostButton.onclick = async function () {
+            const postQuantity = parseInt(
+              document.getElementById("postQuantity").value
+            );
+            if (isNaN(postQuantity) || postQuantity <= 0) {
+              alert("Please enter a valid quantity to post.");
+              return;
+            }
+
+            const item = window.currentPostItem;
+            if (postQuantity > item.quantity) {
+              alert("The quantity to post exceeds available inventory.");
+              return;
+            }
+
+            // Posting the item
+            await postItemToFirebase(item, postQuantity);
+
+            // Update inventory quantity or remove item
+            if (postQuantity === item.quantity) {
+              // Remove the entire item from inventory
+              await deleteItemFromFirebase(window.currentPostItemId);
+            } else {
+              // Update the quantity in inventory
+              const updatedQuantity = item.quantity - postQuantity;
+              await editItemInFirebase(window.currentPostItemId, {
+                name: item.name,
+                quantity: updatedQuantity,
+                expiryDate: item.expiryDate,
+              });
+            }
+
+            closePostItemPopup();
+            getInventoryFromFirebase(); // Refresh the inventory to reflect changes
+          };
+        }
+      });
+
+      function signOut() {
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+    <style>
+      body {
+        background: linear-gradient(to bottom, #7bc977, #f0f7c3);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .btn {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      #addItemPopup,
+      #postItemPopup {
+        animation: fadeIn 0.3s ease-in-out;
+        z-index: 1000;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        width: 100%;
+      }
+      th {
+        background: #6ea83b;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 10px 10px 0 0;
+      }
+      td {
+        background: #e8f5e9;
+        padding: 20px;
+        border-radius: 5px;
+      }
+      .flex.space-x-3 .btn {
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Add Item Popup -->
+    <div
+      id="addItemPopup"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="bg-white p-8 rounded-lg shadow-2xl w-1/3">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">+ Add New Item</h3>
+        <div class="mb-4">
+          <label for="itemName" class="block text-sm font-medium text-gray-700"
+            >Item Name</label
+          >
+          <input
+            type="text"
+            id="itemName"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="itemQuantity"
+            class="block text-sm font-medium text-gray-700"
+            >Quantity</label
+          >
+          <input
+            type="number"
+            id="itemQuantity"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="itemExpiryDate"
+            class="block text-sm font-medium text-gray-700"
+            >Expiry Date</label
+          >
+          <input
+            type="date"
+            id="itemExpiryDate"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button
+            onclick="closeAddItemPopup()"
+            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            id="saveItemButton"
+            onclick="addItem()"
+            class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Add Item
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post Item Popup -->
+    <div
+      id="postItemPopup"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="bg-white p-8 rounded-lg shadow-2xl w-1/3">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">
+          Post Item for Donation
+        </h3>
+        <div class="mb-4">
+          <label
+            for="postQuantity"
+            class="block text-sm font-medium text-gray-700"
+            >Quantity to Post</label
+          >
+          <input
+            type="number"
+            id="postQuantity"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            placeholder="Enter quantity to post"
+          />
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button
+            onclick="closePostItemPopup()"
+            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmPostButton"
+            class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Confirm Post
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-semibold text-gray-800">
+          Inventory Management
+        </h2>
+        <button
+          id="addItemButton"
+          class="bg-green-600 hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105"
+        >
+          + Add New Item
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-lg">
+          <thead>
+            <tr class="bg-gradient-to-r from-green-500 to-green-700 text-white">
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Item Name
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Quantity
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Expiry Date
+              </th>
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable">
+            <!-- Inventory items will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

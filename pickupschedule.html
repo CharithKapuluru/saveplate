@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pickup Schedule</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .pickups-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .pickup-card {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .pickup-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      }
+      .pickup-title {
+        font-size: 1.8rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      .pickup-details {
+        font-size: 1.2rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
+      }
+      .pickedup-button {
+        background-color: #4e7d16;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+      .pickedup-button:hover {
+        background-color: #3b6b14;
+        transform: translateY(-3px);
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Pickup Schedule Content -->
+    <div class="pickups-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
+        My Pickup Schedule
+      </h1>
+
+      <!-- <div id="pickupList" class="space-y-6">
+      </div> -->
+      <h2 class="text-2xl font-bold mb-4 text-green-700">Upcoming Pickups</h2>
+      <div id="upcomingPickupList" class="space-y-6">
+        <!-- Upcoming pickups will be dynamically inserted here -->
+      </div>
+
+      <h2 class="text-2xl font-bold mb-4 text-green-700">Completed Pickups</h2>
+      <div id="completedPickupList" class="space-y-6">
+        <!-- Completed pickups will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+        update,
+        remove,
+        push,
+        set,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Attach Firebase functions to the window object for global access
+      window.database = database;
+      window.ref = ref;
+      window.get = get;
+      window.child = child;
+      window.update = update;
+      window.remove = remove;
+      window.push = push;
+      window.set = set;
+
+      // Fetch pickup schedule from Firebase
+      async function fetchPickupSchedule() {
+        try {
+          const userUid = localStorage.getItem("userUid");
+          const dbRef = ref(database);
+          const snapshot = await get(child(dbRef, `pickups/${userUid}`));
+
+          const upcomingPickupList =
+            document.getElementById("upcomingPickupList");
+          const completedPickupList = document.getElementById(
+            "completedPickupList"
+          );
+
+          if (!upcomingPickupList || !completedPickupList) {
+            console.error("Required DOM elements are missing.");
+            return;
+          }
+
+          upcomingPickupList.innerHTML = ""; // Clear existing upcoming pickups
+          completedPickupList.innerHTML = ""; // Clear existing completed pickups
+
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const pickup = childSnapshot.val();
+              const pickupCard = document.createElement("div");
+              pickupCard.classList.add("pickup-card");
+
+              pickupCard.innerHTML = `
+                <h2 class="pickup-title">${pickup.itemName}</h2>
+                <p class="pickup-details">Pickup By: ${pickup.expiryDate}</p>
+              `;
+
+              if (pickup.status === "upcoming") {
+                pickupCard.innerHTML += `
+                  <button class="pickedup-button" onclick="markAsPickedUp('${childSnapshot.key}')">Picked Up</button>
+                `;
+                upcomingPickupList.appendChild(pickupCard);
+              } else if (pickup.status === "completed") {
+                pickupCard.innerHTML += `
+                  <p class="pickup-details text-green-500 font-bold">Status: Completed</p>
+                `;
+                completedPickupList.appendChild(pickupCard);
+              }
+            });
+          } else {
+            console.log("No pickups available.");
+          }
+        } catch (error) {
+          console.error("Error fetching pickups: ", error);
+        }
+      }
+
+      window.fetchPickupSchedule = fetchPickupSchedule;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchPickupSchedule();
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+      });
+
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+    <script>
+      // Function to mark a pickup as completed
+      async function markAsPickedUp(pickupId) {
+        try {
+          const userUid = localStorage.getItem("userUid");
+          const pickupRef = window.ref(
+            window.database,
+            `pickups/${userUid}/${pickupId}`
+          );
+          const pickupSnapshot = await window.get(pickupRef);
+
+          if (pickupSnapshot.exists()) {
+            const pickup = pickupSnapshot.val();
+
+            // Fetch the original food post to get the manager's information
+            const foodPostsRef = window.ref(window.database, "foodPosts");
+            const foodPostsSnapshot = await window.get(foodPostsRef);
+
+            let managerId = "Unknown"; // Default value if not found
+            let originalFoodPostKey = null; // Track the key of the food post to update
+
+            foodPostsSnapshot.forEach((childSnapshot) => {
+              const foodPost = childSnapshot.val();
+              if (
+                foodPost.name === pickup.itemName &&
+                foodPost.expiryDate === pickup.expiryDate &&
+                foodPost.status === "ready to pickup"
+              ) {
+                managerId = foodPost.managerId || "Unknown"; // Set the managerId
+                originalFoodPostKey = childSnapshot.key; // Store the key of the food post
+              }
+            });
+
+            if (originalFoodPostKey) {
+              // Update the status of the food post to 'donated'
+              const foodPostToUpdateRef = window.ref(
+                window.database,
+                `foodPosts/${originalFoodPostKey}`
+              );
+              await window.update(foodPostToUpdateRef, { status: "donated" });
+
+              // Move the item to the "donations" database
+              const donationsRef = ref(database, "donations");
+              const newDonationRef = push(donationsRef);
+              await set(newDonationRef, {
+                itemName: pickup.itemName,
+                quantity: pickup.quantity,
+                expiryDate: pickup.expiryDate,
+                managerId: managerId,
+                volunteerId: userUid,
+                status: "donated",
+              });
+
+              // Update the pickup status to 'completed' instead of removing it
+              await window.update(pickupRef, { status: "completed" });
+
+              alert("Item picked up and marked as donated!");
+              // Store manager ID in localStorage to use in feedback form
+              localStorage.setItem("feedbackManagerId", managerId);
+              localStorage.setItem("feedbackItemName", pickup.itemName);
+
+              window.fetchPickupSchedule(); // Refresh the pickup schedule
+              // Redirect to the feedback page
+              window.location.href = "volunteerFeedback.html";
+            } else {
+              console.error(
+                "No matching food post data found for this pickup."
+              );
+            }
+          } else {
+            console.error("No pickup data found.");
+          }
+        } catch (error) {
+          console.error("Error marking pickup as picked up: ", error);
+          alert("Failed to mark the item as picked up.");
+        }
+      }
+
+      // Make `markAsPickedUp` globally available
+      window.markAsPickedUp = markAsPickedUp;
+
+      function signOut() {
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>

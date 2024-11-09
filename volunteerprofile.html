@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volunteer Profile</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .profile-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .profile-container h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 2rem;
+      }
+      .profile-container label {
+        font-weight: bold;
+        color: #2d3748;
+        margin-top: 1.5rem; /* Added margin to create space between elements */
+        display: block;
+      }
+      .profile-container input,
+      .profile-container textarea {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-top: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      .profile-container .submit-btn {
+        background-color: #87a330;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+        margin-top: 2rem; /* Added margin for better spacing */
+        width: 100%;
+      }
+      .profile-container .submit-btn:hover {
+        background-color: #4e7d16;
+        transform: translateY(-3px);
+      }
+      .badge,
+      .certificate {
+        background: #e0f7fa;
+        color: #1a202c;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+      }
+      .badges-certificates-container {
+        margin-top: 3rem; /* Create space above badges and certificates section */
+      }
+      .badges-certificates-container h2 {
+        font-size: 1.8rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Volunteer Profile Content -->
+    <div class="profile-container mt-10">
+      <h1>Volunteer Profile</h1>
+
+      <form id="volunteer-profile-form">
+        <!-- Name (Display only) -->
+        <label for="volunteer-name">Name</label>
+        <input type="text" id="volunteer-name" disabled />
+
+        <!-- Contact Information -->
+        <label for="volunteer-email">Email</label>
+        <input type="email" id="volunteer-email" disabled />
+
+        <label for="volunteer-phone">Phone Number</label>
+        <input
+          type="tel"
+          id="volunteer-phone"
+          placeholder="Enter your phone number"
+          pattern="[0-9]{10}"
+        />
+
+        <!-- Preferred Locations -->
+        <label for="preferred-locations">Preferred Locations</label>
+        <textarea
+          id="preferred-locations"
+          placeholder="Enter your preferred locations for volunteering"
+        ></textarea>
+
+        <!-- Submit Button -->
+        <button
+          type="button"
+          class="submit-btn"
+          onclick="saveVolunteerProfile()"
+        >
+          Save Profile
+        </button>
+      </form>
+
+      <!-- Badges Earned and Certificates Section -->
+      <div class="badges-certificates-container">
+        <!-- Badges Earned -->
+        <h2>Badges Earned</h2>
+        <div id="badge-list" class="space-y-4">
+          <!-- Badges will be dynamically loaded here -->
+          <div class="badge">No badges earned yet.</div>
+        </div>
+
+        <!-- Certificates -->
+        <h2>Certificates</h2>
+        <div id="certificate-list" class="space-y-4">
+          <!-- Certificates will be dynamically loaded here -->
+          <div class="certificate">No certificates available yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        update,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase and attach services to the window object
+      const app = initializeApp(firebaseConfig);
+      window.database = getDatabase(app);
+      window.auth = getAuth(app);
+
+      // Attach Firebase services to the window object for global access
+      window.firebaseApp = app;
+      window.database = database;
+      window.auth = auth;
+      window.ref = ref;
+      window.update = update;
+
+      // Fetch and display the current user's profile data
+      function loadVolunteerProfile() {
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            const userUid = user.uid;
+            const dbRef = ref(database);
+            const snapshot = await get(child(dbRef, "users/" + userUid));
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              document.getElementById("volunteer-name").value =
+                userData.name || "";
+              document.getElementById("volunteer-email").value =
+                userData.email || "";
+              document.getElementById("volunteer-phone").value =
+                userData.phoneNumber || "";
+              document.getElementById("preferred-locations").value =
+                userData.preferredLocations || "";
+
+              // Load badges if available
+              if (userData.badges) {
+                const badgeListElement = document.getElementById("badge-list");
+                badgeListElement.innerHTML = ""; // Clear existing badges
+                userData.badges.forEach((badge) => {
+                  const badgeDiv = document.createElement("div");
+                  badgeDiv.classList.add("badge");
+                  badgeDiv.textContent = badge;
+                  badgeListElement.appendChild(badgeDiv);
+                });
+              }
+
+              // Load certificates if available
+              if (userData.certificates) {
+                const certificateListElement =
+                  document.getElementById("certificate-list");
+                certificateListElement.innerHTML = ""; // Clear existing certificates
+                userData.certificates.forEach((certificate) => {
+                  const certificateDiv = document.createElement("div");
+                  certificateDiv.classList.add("certificate");
+                  certificateDiv.textContent = certificate;
+                  certificateListElement.appendChild(certificateDiv);
+                });
+              }
+            } else {
+              console.log("No data available");
+            }
+          } else {
+            // If no user is signed in, redirect to the login page
+            window.location.href = "index.html";
+          }
+        });
+      }
+
+      // Attach loadProfile to the window object for global access
+      window.loadVolunteerProfile = loadVolunteerProfile;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load the profile when the page loads
+        loadVolunteerProfile();
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Define the saveVolunteerProfile function globally
+        function saveVolunteerProfile() {
+          const auth = window.auth;
+          const database = window.database;
+
+          const volunteerName = document.getElementById("volunteer-name").value;
+          const volunteerEmail =
+            document.getElementById("volunteer-email").value;
+          const phoneNumber = document.getElementById("volunteer-phone").value;
+          const preferredLocations = document.getElementById(
+            "preferred-locations"
+          ).value;
+
+          // Check if user is authenticated
+          const user = auth.currentUser;
+          if (user) {
+            const userUid = user.uid;
+            // Update user's profile information in Firebase Database
+            const userRef = window.ref(window.database, "users/" + userUid);
+            window
+              .update(userRef, {
+                name: volunteerName,
+                email: volunteerEmail,
+                phoneNumber: phoneNumber,
+                preferredLocations: preferredLocations,
+              })
+              .then(() => {
+                alert("Profile updated successfully!");
+              })
+              .catch((error) => {
+                console.error("Error updating profile: ", error);
+                alert("Failed to update profile. Please try again.");
+              });
+          } else {
+            // If no user is signed in, redirect to the login page
+            window.location.href = "index.html";
+          }
+        }
+
+        // Attach saveVolunteerProfile to the window object if needed
+        window.saveVolunteerProfile = saveVolunteerProfile;
+      });
+
+      function signOut() {
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "volunteerSignup.html";
+      }
+    </script>
+  </body>
+</html>

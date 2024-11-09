@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volunteer Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .dashboard-overview {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+      }
+      .dashboard-overview h1 {
+        font-size: 2.5rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      .dashboard-overview p {
+        font-size: 1.2rem;
+        color: #2d3748;
+        margin-bottom: 2rem;
+      }
+      .overview-cards {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .card {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        width: 200px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      }
+      .card h2 {
+        font-size: 1.5rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      .card p {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1a202c;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Volunteer Dashboard Content -->
+    <main class="dashboard-overview">
+      <h1>Volunteer Dashboard</h1>
+      <p>
+        Welcome to your volunteer dashboard. Here's a quick overview of your
+        current stats.
+      </p>
+
+      <div class="overview-cards">
+        <div class="card">
+          <h2>Total Pickups Done</h2>
+          <p id="totalPickups">0</p>
+        </div>
+        <div class="card">
+          <h2>Donation Requests Raised</h2>
+          <p id="totalDonationRequests">0</p>
+        </div>
+        <div class="card">
+          <h2>Total Feedbacks Given</h2>
+          <p id="totalFeedbacks">0</p>
+        </div>
+        <div class="card">
+          <h2>Alerts and Notifications</h2>
+          <p id="totalAlerts">0</p>
+        </div>
+      </div>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Fetch volunteer statistics from Firebase
+      async function fetchVolunteerStats() {
+        try {
+          const uid = localStorage.getItem("userUid");
+          const dbRef = ref(database);
+          const snapshot = await get(child(dbRef, `volunteerStats/${uid}`));
+          if (snapshot.exists()) {
+            const stats = snapshot.val();
+            document.getElementById("totalPickups").textContent =
+              stats.totalPickups || 0;
+            document.getElementById("totalDonationRequests").textContent =
+              stats.totalDonationRequests || 0;
+            document.getElementById("totalFeedbacks").textContent =
+              stats.totalFeedbacks || 0;
+            document.getElementById("totalAlerts").textContent =
+              stats.totalAlerts || 0;
+          } else {
+            console.log("No data available");
+          }
+        } catch (error) {
+          console.error("Error fetching volunteer stats: ", error);
+        }
+      }
+
+      // Fetch stats on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchVolunteerStats();
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+      });
+    </script>
+    <script>
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "volunteerSignup.html";
+      }
+    </script>
+  </body>
+</html>
