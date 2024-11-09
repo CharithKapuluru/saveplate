@@ -171,6 +171,7 @@
         getAuth,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      import { postNotification } from "./notifications.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -349,7 +350,10 @@
               restaurantAddress: restaurantAddress,
             })
             .then(() => {
-              alert("Profile updated successfully!");
+              postNotification(
+                userUid,
+                "Your Profile is updated successfully!"
+              );
             })
             .catch((error) => {
               console.error("Error updating profile: ", error);
@@ -367,7 +371,7 @@
       function signOut() {
         localStorage.clear();
         alert("You have been signed out.");
-        window.location.href = "managerSignup.html";
+        window.location.href = "index.html";
       }
     </script>
   </body>

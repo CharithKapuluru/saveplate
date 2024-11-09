@@ -20,6 +20,7 @@
         update,
         remove,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { postNotification } from "./notifications.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
@@ -92,7 +93,8 @@
           managerId: userUid, // Add managerId to track the post
         });
 
-        alert(
+        postNotification(
+          userUid,
           `Successfully posted ${postQuantity} of ${item.name} for donation.`
         );
       };
@@ -144,18 +146,23 @@
         table.innerHTML = "";
 
         window.inventory.forEach((item) => {
+          if (item.quantity <= 0) {
+            return;
+          }
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td class="border px-6 py-6 bg-gradient-to-br from-green-200 via-green-300 to-green-400 text-gray-900 font-semibold rounded-l-lg shadow-lg">${item.name}</td>
-            <td class="border px-6 py-6 bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400 text-gray-900 font-semibold shadow-lg">${item.quantity}</td>
-            <td class="border px-6 py-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 text-gray-900 font-semibold shadow-lg">${item.expiryDate}</td>
-            <td class="border px-6 py-6 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 rounded-r-lg shadow-lg">
+            <td class="border px-6 py-6 bg-[#dff3e4] text-gray-900 font-semibold rounded-l-lg shadow-lg">${item.name}</td>
+            <td class="border px-6 py-6 bg-[#dff3e4] text-gray-900 font-semibold shadow-lg">${item.quantity}</td>
+            <td class="border px-6 py-6 bg-[#dff3e4] text-gray-900 font-semibold shadow-lg">${item.expiryDate}</td>
+            <td class="border px-6 py-6 bg-[#dff3e4] rounded-r-lg shadow-lg">
               <div class="flex space-x-3">
                 <button id="edit-${item.id}" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Edit</button>
                 <button id="delete-${item.id}" class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Delete</button>
                 <button id="post-${item.id}" class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Post</button>
               </div>
             </td>
+
+
           `;
           table.appendChild(row);
 
@@ -326,48 +333,83 @@
     </script>
     <style>
       body {
-        background: linear-gradient(to bottom, #7bc977, #f0f7c3);
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
         color: #1a202c;
         font-family: "Arial", sans-serif;
       }
-      .btn {
-        transition: background-color 0.3s, transform 0.3s;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      }
-      .btn:hover {
-        transform: translateY(-2px);
-      }
-      #addItemPopup,
-      #postItemPopup {
-        animation: fadeIn 0.3s ease-in-out;
-        z-index: 1000;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
+
       table {
         border-collapse: separate;
         border-spacing: 0 15px;
         width: 100%;
+        margin-top: 20px;
+        background-color: #dff3e4; /* Light green shade from the body background */
       }
+
       th {
-        background: #6ea83b;
+        background-color: #a8d996; /* Darker green shade from the body background */
         color: #ffffff;
         padding: 12px;
         border-radius: 10px 10px 0 0;
+        text-align: left;
       }
+
       td {
-        background: #e8f5e9;
+        background-color: #fffdfb; /* Keep a white background for readability */
+        color: #1a202c;
         padding: 20px;
         border-radius: 5px;
+        border: 1px solid #a8d5ba; /* Border color to match table consistency */
       }
-      .flex.space-x-3 .btn {
-        margin-bottom: 5px;
+
+      .btn {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .container {
+        margin-top: 20px;
+      }
+      #postItemPopup {
+        z-index: 10000;
+      }
+
+      #postItemPopup div {
+        animation: fadeIn 0.3s ease-in-out;
+        max-width: 450px;
+      }
+
+      #addItemPopup {
+        z-index: 10000;
+      }
+
+      #addItemPopup div {
+        animation: fadeIn 0.3s ease-in-out;
+        max-width: 450px;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .inventory-container {
+        background: #a8d5ba;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      body.modal-open {
+        overflow: hidden;
       }
     </style>
   </head>
@@ -382,10 +424,13 @@
     <!-- Add Item Popup -->
     <div
       id="addItemPopup"
-      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[10000]"
+      style="transition: all 0.3s ease-in-out"
     >
-      <div class="bg-white p-8 rounded-lg shadow-2xl w-1/3">
-        <h3 class="text-2xl font-bold mb-4 text-gray-800">+ Add New Item</h3>
+      <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg">
+        <h3 class="text-2xl font-bold mb-4 text-green-700 text-center">
+          + Add New Item
+        </h3>
         <div class="mb-4">
           <label for="itemName" class="block text-sm font-medium text-gray-700"
             >Item Name</label
@@ -393,7 +438,8 @@
           <input
             type="text"
             id="itemName"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Enter item name"
           />
         </div>
         <div class="mb-4">
@@ -405,7 +451,8 @@
           <input
             type="number"
             id="itemQuantity"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Enter quantity"
           />
         </div>
         <div class="mb-4">
@@ -417,20 +464,20 @@
           <input
             type="date"
             id="itemExpiryDate"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
         <div class="flex justify-end space-x-4">
           <button
             onclick="closeAddItemPopup()"
-            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Cancel
           </button>
           <button
             id="saveItemButton"
             onclick="addItem()"
-            class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            class="btn bg-green-600 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Add Item
           </button>
@@ -441,35 +488,37 @@
     <!-- Post Item Popup -->
     <div
       id="postItemPopup"
-      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[10000]"
+      style="transition: all 0.3s ease-in-out"
     >
-      <div class="bg-white p-8 rounded-lg shadow-2xl w-1/3">
-        <h3 class="text-2xl font-bold mb-4 text-gray-800">
+      <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg">
+        <h3 class="text-2xl font-bold mb-4 text-green-700 text-center">
           Post Item for Donation
         </h3>
         <div class="mb-4">
           <label
             for="postQuantity"
             class="block text-sm font-medium text-gray-700"
-            >Quantity to Post</label
           >
+            Quantity to Post
+          </label>
           <input
             type="number"
             id="postQuantity"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Enter quantity to post"
           />
         </div>
         <div class="flex justify-end space-x-4">
           <button
             onclick="closePostItemPopup()"
-            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            class="btn bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Cancel
           </button>
           <button
             id="confirmPostButton"
-            class="btn bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            class="btn bg-green-600 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Confirm Post
           </button>
@@ -490,10 +539,10 @@
           + Add New Item
         </button>
       </div>
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto inventory-container">
         <table class="min-w-full bg-white rounded-lg shadow-lg">
           <thead>
-            <tr class="bg-gradient-to-r from-green-500 to-green-700 text-white">
+            <tr class="text-white">
               <th class="py-4 px-6 border-b text-left text-sm font-semibold">
                 Item Name
               </th>

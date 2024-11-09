@@ -99,6 +99,8 @@
         push,
         set,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { showToast } from "./notification.js";
+      import { postNotification } from "./notifications.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -232,13 +234,45 @@
             pickupButton.disabled = true;
             pickupButton.classList.add("disabled-button");
 
-            alert("Item added to your pickup schedule!");
+            localStorage.setItem(
+              "notificationMessage",
+              "Item added to your pickup schedule!"
+            );
+            // Post a notification using the function from notifications.js
+            await postNotification(
+              userUid,
+              `${foodPost.name} is added to you pickup Schedule.`,
+              foodPost.managerId,
+              foodPost.name
+            );
+
+            const userRef = ref(database, `users/${userUid}`);
+            const userSnapshot = await get(userRef);
+
+            if (userSnapshot.exists()) {
+              const userName = userSnapshot.val().name;
+
+              await postNotification(
+                foodPost.managerId,
+                `${userName} is ready to pickup ${foodPost.name} for donation.`,
+                userUid,
+                foodPost.name
+              );
+            } else {
+              console.error("Failed to fetch user name for notification.");
+            }
+
             // Redirect to the pickup schedule page
             window.location.href = "pickupschedule.html";
           }
         } catch (error) {
           console.error("Error picking up item: ", error);
-          alert("Failed to pick up the item.");
+          postNotification(
+            userUid,
+            `Failed to add the item ${foodPost.name} to pickup schedule.`,
+            foodPost.managerId,
+            foodPost.name
+          );
         }
       }
 

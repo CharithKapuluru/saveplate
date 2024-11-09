@@ -8,6 +8,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="main.css" />
     <style>
       body {
         background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
@@ -96,6 +97,17 @@
         push,
         set,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { showToast } from "./notification.js";
+      import { postNotification } from "./notifications.js";
+
+      // Check if there is a notification message in localStorage
+      document.addEventListener("DOMContentLoaded", () => {
+        const notificationMessage = localStorage.getItem("notificationMessage");
+        if (notificationMessage) {
+          showToast(notificationMessage);
+          localStorage.removeItem("notificationMessage"); // Remove after showing the notification
+        }
+      });
 
       // Firebase configuration
       const firebaseConfig = {
@@ -190,13 +202,6 @@
             });
         }
       });
-
-      function signOut() {
-        // Clear local storage and redirect to sign-in page
-        localStorage.clear();
-        alert("You have been signed out.");
-        window.location.href = "index.html";
-      }
     </script>
     <script>
       // Function to mark a pickup as completed
@@ -254,7 +259,23 @@
               // Update the pickup status to 'completed' instead of removing it
               await window.update(pickupRef, { status: "completed" });
 
-              alert("Item picked up and marked as donated!");
+              localStorage.setItem(
+                "notificationMessage",
+                "Item picked up and marked as donated!"
+              );
+              // Post a notification using the function from notifications.js
+              postNotification(
+                managerId,
+                `${pickup.quantity} ${pickup.itemName} have been Donated.`,
+                userUid,
+                pickup.itemName
+              );
+              postNotification(
+                userUid,
+                `You have successfully picked up ${pickup.itemName} and Donated!`,
+                managerId,
+                pickup.itemName
+              );
               // Store manager ID in localStorage to use in feedback form
               localStorage.setItem("feedbackManagerId", managerId);
               localStorage.setItem("feedbackItemName", pickup.itemName);

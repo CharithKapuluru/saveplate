@@ -33,9 +33,9 @@
       }
       .overview-cards {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1.5rem;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 1rem;
       }
       .card {
         background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
@@ -61,6 +61,14 @@
         font-weight: bold;
         color: #1a202c;
       }
+      .btn-raise-request {
+        display: inline-block;
+        margin-bottom: 20px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+      #donationRequestModal.hidden {
+        display: none;
+      }
     </style>
   </head>
   <body class="bg-green-100 min-h-screen">
@@ -78,6 +86,15 @@
         Welcome to your volunteer dashboard. Here's a quick overview of your
         current stats.
       </p>
+      <!-- Button Container for Centering -->
+      <div class="flex justify-center">
+        <button
+          class="btn-raise-request bg-green-700 text-white font-bold py-3 px-6 rounded-full mt-4 transition hover:bg-green-800 transform hover:scale-105"
+          onclick="openDonationRequestModal()"
+        >
+          Raise a Donation Request
+        </button>
+      </div>
 
       <div class="overview-cards">
         <div class="card">
@@ -97,6 +114,87 @@
           <p id="totalAlerts">0</p>
         </div>
       </div>
+      <!-- Donation Request Modal -->
+      <div
+        id="donationRequestModal"
+        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center hidden"
+      >
+        <div
+          class="bg-white rounded-lg p-8 max-w-lg w-full shadow-2xl transform transition-transform duration-300 scale-95 hover:scale-100"
+        >
+          <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">
+            Raise a Donation Request
+          </h2>
+          <form
+            id="donation-request-form"
+            onsubmit="submitDonationRequest(event)"
+          >
+            <div class="mb-4">
+              <label
+                for="item"
+                class="block text-lg font-semibold text-gray-800 mb-2"
+              >
+                Food Item Needed
+              </label>
+              <input
+                type="text"
+                id="item"
+                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                placeholder="Enter the food item"
+                required
+              />
+            </div>
+
+            <div class="mb-4">
+              <label
+                for="quantity"
+                class="block text-lg font-semibold text-gray-800 mb-2"
+              >
+                Quantity Needed
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                placeholder="Enter quantity needed"
+                required
+              />
+            </div>
+
+            <div class="mb-6">
+              <label
+                for="area"
+                class="block text-lg font-semibold text-gray-800 mb-2"
+              >
+                Area
+              </label>
+              <input
+                type="text"
+                id="area"
+                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                placeholder="Enter your area"
+                required
+              />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <button
+                type="submit"
+                class="bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-green-800 focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transform transition hover:scale-105"
+              >
+                Submit Request
+              </button>
+              <button
+                type="button"
+                onclick="closeDonationRequestModal()"
+                class="ml-4 text-gray-600 underline hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
 
     <script type="module">
@@ -106,7 +204,10 @@
         ref,
         get,
         child,
+        push,
+        set,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { postNotification } from "./notifications.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -124,25 +225,119 @@
       const app = initializeApp(firebaseConfig);
       const database = getDatabase(app);
 
+      // Attach Firebase services to the window object for global access
+      window.database = database;
+      window.ref = ref;
+      window.push = push;
+      window.set = set;
+
+      window.openDonationRequestModal = function openDonationRequestModal() {
+        const modal = document.getElementById("donationRequestModal");
+        modal.classList.remove("hidden");
+      };
+
+      // Function to close the donation request modal
+      window.closeDonationRequestModal = function closeDonationRequestModal() {
+        document.getElementById("donationRequestModal").classList.add("hidden");
+      };
+
+      // Function to submit donation request
+      // Function to submit donation request
+      window.submitDonationRequest = async function submitDonationRequest(
+        event
+      ) {
+        event.preventDefault(); // Prevent page reload
+
+        const uid = localStorage.getItem("userUid");
+        const item = document.getElementById("item").value.trim();
+        const quantity = document.getElementById("quantity").value.trim();
+        const area = document.getElementById("area").value.trim();
+
+        if (item && quantity && area) {
+          try {
+            // Store the donation request in Firebase
+            const donationRequestsRef = window.ref(
+              window.database,
+              "donationRequests"
+            );
+            const newRequestRef = window.push(donationRequestsRef);
+
+            await window.set(newRequestRef, {
+              volunteerId: uid,
+              item: item,
+              quantity: parseFloat(quantity),
+              area: area,
+              timestamp: new Date().toISOString(),
+            });
+
+            postNotification(
+              uid,
+              `You have raised donation request for ${item}.`
+            );
+            closeDonationRequestModal();
+          } catch (error) {
+            console.error("Error submitting donation request: ", error);
+            alert("Failed to submit donation request. Please try again.");
+          }
+        }
+      };
+
+      window.openDonationRequestModal = openDonationRequestModal;
+      window.closeDonationRequestModal = closeDonationRequestModal;
+      window.submitDonationRequest = submitDonationRequest;
+
+      // Fetch volunteer statistics from Firebase
       // Fetch volunteer statistics from Firebase
       async function fetchVolunteerStats() {
         try {
           const uid = localStorage.getItem("userUid");
           const dbRef = ref(database);
-          const snapshot = await get(child(dbRef, `volunteerStats/${uid}`));
-          if (snapshot.exists()) {
-            const stats = snapshot.val();
-            document.getElementById("totalPickups").textContent =
-              stats.totalPickups || 0;
-            document.getElementById("totalDonationRequests").textContent =
-              stats.totalDonationRequests || 0;
-            document.getElementById("totalFeedbacks").textContent =
-              stats.totalFeedbacks || 0;
-            document.getElementById("totalAlerts").textContent =
-              stats.totalAlerts || 0;
-          } else {
-            console.log("No data available");
+
+          // Fetch total pickups
+          const pickupsSnapshot = await get(child(dbRef, `pickups/${uid}`));
+          const totalPickups = pickupsSnapshot.exists()
+            ? Object.keys(pickupsSnapshot.val()).length
+            : 0;
+
+          // Fetch total donation requests raised by the volunteer
+          const donationRequestsSnapshot = await get(
+            child(dbRef, `donationRequests`)
+          );
+          let totalDonationRequests = 0;
+          if (donationRequestsSnapshot.exists()) {
+            donationRequestsSnapshot.forEach((childSnapshot) => {
+              if (childSnapshot.val().volunteerId === uid) {
+                totalDonationRequests++;
+              }
+            });
           }
+
+          // Fetch total feedbacks given by the volunteer
+          const feedbacksSnapshot = await get(child(dbRef, `feedbacks`));
+          let totalFeedbacks = 0;
+          if (feedbacksSnapshot.exists()) {
+            feedbacksSnapshot.forEach((childSnapshot) => {
+              if (childSnapshot.val().volunteerId === uid) {
+                totalFeedbacks++;
+              }
+            });
+          }
+
+          // Fetch total notifications for the volunteer
+          const notificationsSnapshot = await get(
+            child(dbRef, `notifications/${uid}`)
+          );
+          const totalAlerts = notificationsSnapshot.exists()
+            ? Object.keys(notificationsSnapshot.val()).length
+            : 0;
+
+          // Update the UI with the fetched values
+          document.getElementById("totalPickups").textContent = totalPickups;
+          document.getElementById("totalDonationRequests").textContent =
+            totalDonationRequests;
+          document.getElementById("totalFeedbacks").textContent =
+            totalFeedbacks;
+          document.getElementById("totalAlerts").textContent = totalAlerts;
         } catch (error) {
           console.error("Error fetching volunteer stats: ", error);
         }
@@ -151,22 +346,27 @@
       // Fetch stats on page load
       document.addEventListener("DOMContentLoaded", function () {
         fetchVolunteerStats();
-
-        // Load the appropriate navbar for the volunteer
         const userRole = localStorage.getItem("userRole");
-
         if (userRole === "Restaurant Manager") {
           fetch("managerNavbar.html")
             .then((response) => response.text())
             .then((data) => {
               document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
             });
         } else if (userRole === "Volunteer") {
           fetch("volunteerNavbar.html")
             .then((response) => response.text())
             .then((data) => {
               document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
             });
+        } else {
+          console.error("User role not set properly in localStorage.");
         }
       });
     </script>
@@ -175,7 +375,7 @@
         // Clear local storage and redirect to sign-in page
         localStorage.clear();
         alert("You have been signed out.");
-        window.location.href = "volunteerSignup.html";
+        window.location.href = "index.html";
       }
     </script>
   </body>

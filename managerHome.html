@@ -14,65 +14,7 @@
     <header class="bg-green-700 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
-        <nav>
-          <ul class="flex space-x-4">
-            <li>
-              <a
-                href="managerHome.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Home</a
-              >
-            </li>
-            <li>
-              <a
-                href="inventoryManagement.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Inventory Management</a
-              >
-            </li>
-            <li>
-              <a
-                href="food_posting.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Food Posting</a
-              >
-            </li>
-            <li>
-              <a
-                href="donation_requests.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Donation Requests</a
-              >
-            </li>
-            <li>
-              <a
-                href="waste_logging.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Waste Logging</a
-              >
-            </li>
-            <li>
-              <a
-                href="messaging.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Messaging</a
-              >
-            </li>
-            <li>
-              <a
-                href="profile.html"
-                class="py-2 px-4 rounded hover:bg-green-600"
-                >Profile</a
-              >
-            </li>
-          </ul>
-        </nav>
-        <button
-          class="py-2 px-4 rounded bg-red-500 hover:bg-red-600"
-          onclick="signOut()"
-        >
-          Sign Out
-        </button>
+        <div id="navbar-container"></div>
       </div>
     </header>
 
@@ -85,7 +27,7 @@
         Manage your inventory, post surplus food, handle donation requests, and
         keep track of your waste logging and messaging—all from one place.
       </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-lg shadow-md">
           <h3 class="text-xl font-bold text-green-700 mb-4">
             Inventory Management
@@ -94,7 +36,7 @@
             Track and manage your inventory effectively to minimize food waste.
           </p>
           <a
-            href="inventory_management.html"
+            href="inventoryManagement.html"
             class="text-green-600 hover:underline"
           >
             Go to Inventory Management &rarr;
@@ -107,7 +49,7 @@
           <p class="text-gray-700 mb-4">
             Post details of surplus food available for donation.
           </p>
-          <a href="food_posting.html" class="text-green-600 hover:underline">
+          <a href="foodposting.html" class="text-green-600 hover:underline">
             Post Surplus Food &rarr;
           </a>
         </div>
@@ -119,7 +61,7 @@
             Manage requests for food donations and collaborate with volunteers.
           </p>
           <a
-            href="donation_requests.html"
+            href="donationrequests.html"
             class="text-green-600 hover:underline"
           >
             View Donation Requests &rarr;
@@ -130,7 +72,7 @@
           <p class="text-gray-700 mb-4">
             Log food waste and keep track of waste reduction initiatives.
           </p>
-          <a href="waste_logging.html" class="text-green-600 hover:underline">
+          <a href="wastelogging.html" class="text-green-600 hover:underline">
             Log Waste &rarr;
           </a>
         </div>
@@ -144,13 +86,126 @@
             Open Messaging &rarr;
           </a>
         </div>
+      </div> -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column for Data Insights -->
+        <div
+          class="lg:row-span-2 bg-white p-6 rounded-lg shadow-md relative"
+          style="
+            background-image: url('./7387979.webp');
+            background-size: auto;
+            background-repeat: no-repeat;
+            background-position: bottom;
+          "
+        >
+          <h3 class="text-2xl font-bold text-green-700 mb-4">Data Insights</h3>
+          <p class="text-gray-700 mb-4">
+            Analyze trends and generate insights to make data-driven decisions.
+          </p>
+          <a
+            href="datainsights.html"
+            class="text-green-600 hover:underline block"
+          >
+            Go to Data Insights &rarr;
+          </a>
+        </div>
+
+        <!-- Right Column for Other Blocks -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:col-span-2"
+        >
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-4">
+              Inventory Management
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Track and manage your inventory effectively to minimize food
+              waste.
+            </p>
+            <a
+              href="inventoryManagement.html"
+              class="text-green-600 hover:underline"
+            >
+              Go to Inventory Management &rarr;
+            </a>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-4">
+              Surplus Food Posting
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Post details of surplus food available for donation.
+            </p>
+            <a href="foodposting.html" class="text-green-600 hover:underline">
+              Post Surplus Food &rarr;
+            </a>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-4">
+              Donation Requests
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Manage requests for food donations and collaborate with
+              volunteers.
+            </p>
+            <a
+              href="donationrequests.html"
+              class="text-green-600 hover:underline"
+            >
+              View Donation Requests &rarr;
+            </a>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-4">Waste Logging</h3>
+            <p class="text-gray-700 mb-4">
+              Log food waste and keep track of waste reduction initiatives.
+            </p>
+            <a href="wastelogging.html" class="text-green-600 hover:underline">
+              Log Waste &rarr;
+            </a>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-4">Messaging</h3>
+            <p class="text-gray-700 mb-4">
+              Communicate with volunteers and other restaurant managers for
+              better collaboration.
+            </p>
+            <a href="messaging.html" class="text-green-600 hover:underline">
+              Open Messaging &rarr;
+            </a>
+          </div>
+        </div>
       </div>
     </main>
 
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else {
+          console.error("User role not set properly in localStorage.");
+        }
+      });
       function signOut() {
         alert("You have signed out.");
-        window.location.href = "managerSignup.html";
+        window.location.href = "index.html";
       }
     </script>
   </body>

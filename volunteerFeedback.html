@@ -78,6 +78,7 @@
         set,
         get,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { postNotification } from "./notifications.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -98,6 +99,8 @@
       document.addEventListener("DOMContentLoaded", () => {
         const managerId = localStorage.getItem("feedbackManagerId");
         const itemName = localStorage.getItem("feedbackItemName");
+
+        const userUid = localStorage.getItem("userUid");
 
         // Set manager name and item name in the form
         document.getElementById("itemName").textContent = itemName;
@@ -134,7 +137,34 @@
               timestamp: new Date().toISOString(),
             });
 
-            alert("Feedback submitted successfully!");
+            const useRef = ref(database, `users/${userUid}`);
+            const useSnapshot = await get(useRef);
+
+            if (useSnapshot.exists()) {
+              const userName = useSnapshot.val().name;
+
+              postNotification(
+                managerId,
+                `You got a feedback from ${userName}.`,
+                userUid,
+                itemName
+              );
+            } else {
+              console.error("Failed to fetch user name for notification.");
+            }
+
+            const managerRef = ref(database, `users/${managerId}`);
+            const managerSnapshot = await get(managerRef);
+
+            if (managerSnapshot.exists()) {
+              const managerName = managerSnapshot.val().name;
+              postNotification(
+                userUid,
+                `Feedback is submitted to ${managerName}.`,
+                managerId,
+                itemName
+              );
+            }
 
             // Clear feedback data from local storage
             localStorage.removeItem("feedbackManagerId");

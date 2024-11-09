@@ -81,6 +81,7 @@
         get,
         onValue,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { postNotification } from "./notifications.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -273,10 +274,26 @@
             message: messageContent,
             timestamp: new Date().toISOString(),
           });
-          console.log("Message sent successfully");
 
           // Clear input field after sending
           messageInput.value = "";
+
+          // Fetch the user's name from the database
+          const userRef = ref(database, `users/${userId}`);
+          const userSnapshot = await get(userRef);
+
+          if (userSnapshot.exists()) {
+            const userName = userSnapshot.val().name;
+
+            // Post a notification to the receiver after sending the message
+            postNotification(
+              selectedContactId, // receiverId
+              `You got a message from ${userName}`, // message
+              userId // senderId (assumed to be logged-in user)
+            );
+          } else {
+            console.error("Failed to fetch user name for notification.");
+          }
         } catch (error) {
           console.error("Failed to send message:", error);
         }

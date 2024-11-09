@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Requests</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .donation-requests-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .donation-card {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        margin-bottom: 15px;
+      }
+      .donation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      }
+      .donation-title {
+        font-size: 1.8rem;
+        color: #4e7d16;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      .donation-details {
+        font-size: 1.2rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <!-- Donation Requests Content -->
+    <div class="donation-requests-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
+        Donation Requests
+      </h1>
+      <div id="donationRequestsContainer" class="space-y-4">
+        <!-- Donation requests will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      // Fetch and display donation requests
+      function fetchDonationRequests() {
+        const donationRequestsRef = ref(db, "donationRequests");
+        const donationRequestsContainer = document.getElementById(
+          "donationRequestsContainer"
+        );
+
+        onValue(donationRequestsRef, async (snapshot) => {
+          donationRequestsContainer.innerHTML = ""; // Clear existing requests
+
+          if (snapshot.exists()) {
+            const donationRequests = [];
+            snapshot.forEach((childSnapshot) => {
+              donationRequests.push({
+                key: childSnapshot.key,
+                ...childSnapshot.val(),
+              });
+            });
+
+            for (const donation of donationRequests) {
+              const volunteerRef = ref(db, `users/${donation.volunteerId}`);
+              const volunteerSnapshot = await get(volunteerRef);
+
+              let volunteerName = "Unknown Volunteer";
+              if (volunteerSnapshot.exists()) {
+                const volunteerData = volunteerSnapshot.val();
+                volunteerName = volunteerData.name || "Unknown Volunteer";
+              }
+
+              const donationCard = document.createElement("div");
+              donationCard.classList.add("donation-card");
+
+              donationCard.innerHTML = `
+                <h2 class="donation-title">${donation.item}</h2>
+                <p class="donation-details">Quantity Needed: ${
+                  donation.quantity
+                }</p>
+                <p class="donation-details">Area: ${donation.area}</p>
+                <p class="donation-details">Requested By: ${volunteerName}</p>
+                <p class="donation-details text-sm text-gray-500">Request Date: ${new Date(
+                  donation.timestamp
+                ).toLocaleDateString()}</p>
+                `;
+              donationRequestsContainer.appendChild(donationCard);
+            }
+          } else {
+            donationRequestsContainer.innerHTML =
+              "<p class='text-center'>No donation requests available at the moment.</p>";
+          }
+        });
+      }
+
+      // Initial rendering of donation requests
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load navbar
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        } else if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            });
+        }
+
+        // Fetch donation requests
+        fetchDonationRequests();
+      });
+    </script>
+    <script>
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>

@@ -11,29 +11,76 @@
 
     <style>
       body {
-        background: linear-gradient(to bottom, #f9f7cf, #dcedc1);
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
         color: #1a202c;
         font-family: "Arial", sans-serif;
       }
+
       .btn-log-waste {
         transition: background-color 0.3s, transform 0.3s;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        background-color: #87a330;
+        background-color: #4e7d16; 
         color: white;
       }
+
       .btn-log-waste:hover {
-        background-color: #4e7d16;
+        background-color: #3a5f11;
         transform: translateY(-2px);
       }
+
+      .waste-container {
+        max-width: 70%; 
+        margin-top: 20px;
+        padding: 20px;
+        background: #a8d5ba; 
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
       table {
         border-collapse: separate;
         border-spacing: 0 15px;
         width: 100%;
+        margin-top: 20px;
+        background-color: #dff3e4; 
       }
-      th,
-      td {
+
+      th {
+        background-color: #a8d996; 
+        color: #ffffff;
         padding: 12px;
-        border: 1px solid #ccc;
+        border-radius: 10px 10px 0 0;
+        text-align: left;
+      }
+
+      td {
+        background-color: #fffdfb; /* Keep a white background for readability */
+        color: #1a202c;
+        padding: 20px;
+        border-radius: 5px;
+        border: 1px solid #a8d5ba; /* Border color to match table consistency */
+      }
+
+      .btn-delete {
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-delete:hover {
+        transform: translateY(-2px);
+      }
+
+      header {
+        margin-bottom: 20px;
+      }
+
+      .form-container {
+        margin: 0 auto; /* Center the form container */
+      }
+
+      .waste-log-table-container {
+        max-width: 900px; /* Reduce the width of the waste log table */
+        margin: 0 auto; /* Center the table */
       }
     </style>
   </head>
@@ -45,71 +92,80 @@
       </div>
     </header>
 
-    <div class="container mx-auto py-8">
-      <h1 class="text-3xl font-bold mb-4 text-green-700">Waste Logging</h1>
-      <p class="mb-6">
+    <div class="waste-container mx-auto py-8">
+      <h1 class="text-3xl font-bold mb-4 text-green-700 text-center">
+        Waste Logging
+      </h1>
+      <p class="mb-6 text-center">
         Log discarded food items by recording quantities and reasons for
         disposal.
       </p>
 
       <form id="waste-log-form" onsubmit="logWaste(event)" class="space-y-6">
-        <label for="item_id" class="block text-sm font-medium text-gray-700"
-          >Select Item</label
-        >
-        <select
-          id="item_id"
-          name="item_id"
-          class="w-full p-2 border rounded"
-          required
-        >
-          <option value="">Select an item</option>
-        </select>
+        <div>
+          <label for="item_id" class="block text-sm font-medium text-gray-700"
+            >Select Item</label
+          >
+          <select
+            id="item_id"
+            name="item_id"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            required
+          >
+            <option value="">Select an item</option>
+          </select>
+        </div>
 
-        <label for="quantity" class="block text-sm font-medium text-gray-700"
-          >Quantity</label
-        >
-        <input
-          type="number"
-          step="0.01"
-          id="quantity"
-          name="quantity"
-          class="w-full p-2 border rounded"
-          required
-        />
+        <div>
+          <label for="quantity" class="block text-sm font-medium text-gray-700"
+            >Quantity</label
+          >
+          <input
+            type="number"
+            step="0.01"
+            id="quantity"
+            name="quantity"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            required
+          />
+        </div>
 
-        <label for="reason" class="block text-sm font-medium text-gray-700"
-          >Reason for Disposal</label
-        >
-        <textarea
-          id="reason"
-          name="reason"
-          class="w-full p-2 border rounded"
-          required
-        ></textarea>
+        <div>
+          <label for="reason" class="block text-sm font-medium text-gray-700"
+            >Reason for Disposal</label
+          >
+          <textarea
+            id="reason"
+            name="reason"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            required
+          ></textarea>
+        </div>
 
         <button type="submit" class="btn-log-waste px-6 py-2 rounded">
           + Log Waste
         </button>
       </form>
 
-      <h2 class="text-2xl font-semibold mt-10 mb-4">Historical Waste Logs</h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded-lg shadow-lg waste-log-table">
-          <thead>
-            <tr class="bg-gradient-to-r from-green-500 to-green-700 text-white">
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Reason</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="waste-log-entries">
-            <!-- Waste log entries will be dynamically rendered here -->
-          </tbody>
-        </table>
+      <div class="waste-log-table-container mx-auto mt-10">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Historical Waste Logs</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white rounded-lg shadow-lg">
+            <thead>
+              <tr class="text-white">
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Reason</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="waste-log-entries">
+              <!-- Waste log entries will be dynamically rendered here -->
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
   </body>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";

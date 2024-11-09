@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Data Insights - Inventory, Donations, and Waste Logs Comparison
+    </title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate - Data Insights</h1>
+        <button
+          onclick="window.location.href='managerhome.html'"
+          class="py-2 px-4 rounded bg-red-500 hover:bg-red-600 text-white"
+        >
+          Back to Home
+        </button>
+      </div>
+    </header>
+
+    <div class="container mt-8">
+      <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">
+        Inventory vs Donations Comparison
+      </h2>
+      <div class="chart-container">
+        <canvas id="inventoryDonationsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="container mt-8">
+      <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">
+        Inventory vs Waste Logs Comparison
+      </h2>
+      <div class="chart-container">
+        <canvas id="inventoryWasteChart"></canvas>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Fetch data for inventory and donations comparison in real-time
+      function fetchComparisonData() {
+        const inventoryRef = ref(database, "inventory");
+        const donationsRef = ref(database, "donations");
+        const comparisonData = {
+          inventoryCount: 0,
+          donationsCount: 0,
+        };
+
+        // Real-time listener for inventory data
+        onValue(inventoryRef, (snapshot) => {
+          comparisonData.inventoryCount = 0;
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              comparisonData.inventoryCount +=
+                childSnapshot.val().quantity || 0;
+            });
+          }
+          updateChart(
+            "inventoryDonationsChart",
+            comparisonData.inventoryCount,
+            comparisonData.donationsCount,
+            "Inventory",
+            "Donations"
+          );
+        });
+
+        // Real-time listener for donations data
+        onValue(donationsRef, (snapshot) => {
+          comparisonData.donationsCount = 0;
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              comparisonData.donationsCount +=
+                childSnapshot.val().quantity || 0;
+            });
+          }
+          updateChart(
+            "inventoryDonationsChart",
+            comparisonData.inventoryCount,
+            comparisonData.donationsCount,
+            "Inventory",
+            "Donations"
+          );
+        });
+      }
+
+      // Fetch data for inventory and waste logs comparison in real-time
+      function fetchWasteComparisonData() {
+        const inventoryRef = ref(database, "inventory");
+        const wasteLogsRef = ref(database, "wasteLogs");
+        const wasteComparisonData = {
+          inventoryCount: 0,
+          wasteCount: 0,
+        };
+
+        // Real-time listener for inventory data
+        onValue(inventoryRef, (snapshot) => {
+          wasteComparisonData.inventoryCount = 0;
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              wasteComparisonData.inventoryCount +=
+                childSnapshot.val().quantity || 0;
+            });
+          }
+          updateChart(
+            "inventoryWasteChart",
+            wasteComparisonData.inventoryCount,
+            wasteComparisonData.wasteCount,
+            "Inventory",
+            "Waste Logs"
+          );
+        });
+
+        // Real-time listener for waste logs data
+        onValue(wasteLogsRef, (snapshot) => {
+          wasteComparisonData.wasteCount = 0;
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              wasteComparisonData.wasteCount +=
+                childSnapshot.val().quantity || 0;
+            });
+          }
+          updateChart(
+            "inventoryWasteChart",
+            wasteComparisonData.inventoryCount,
+            wasteComparisonData.wasteCount,
+            "Inventory",
+            "Waste Logs"
+          );
+        });
+      }
+
+      let charts = {};
+      // Render Chart using Chart.js
+      function updateChart(chartId, data1, data2, label1, label2) {
+        const ctx = document.getElementById(chartId).getContext("2d");
+        if (charts[chartId]) {
+          charts[chartId].destroy();
+        }
+        charts[chartId] = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: [label1, label2],
+            datasets: [
+              {
+                data: [data1, data2],
+                backgroundColor: [
+                  "rgba(78, 125, 22, 0.7)",
+                  "rgba(218, 83, 45, 0.7)",
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              title: {
+                display: true,
+                text: `${label1} vs ${label2} Comparison`,
+              },
+            },
+          },
+        });
+      }
+
+      // Fetch the data and display the charts on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchComparisonData();
+        fetchWasteComparisonData();
+      });
+    </script>
+  </body>
+</html>

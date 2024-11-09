@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
+        font-family: "Arial", sans-serif;
+      }
+
+      .notifications-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .notification-item {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .notification-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .notification-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #2f855a;
+        margin-bottom: 8px;
+      }
+
+      .notification-message {
+        font-size: 1rem;
+        color: #2d3748;
+      }
+
+      .notification-timestamp {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 8px;
+      }
+
+      .header-title {
+        text-align: center;
+        margin-top: 20px;
+        font-weight: bold;
+        font-size: 2.5rem;
+        color: #2f855a;
+        text-shadow: 1px 1px #e6fffa;
+      }
+    </style>
+  </head>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
+      </div>
+    </header>
+
+    <div class="notifications-container">
+      <h1 class="header-title">Your Notifications</h1>
+      <div id="notifications-container">
+        <!-- Notifications will be dynamically added here -->
+        <!-- Example structure of one notification -->
+        <div class="notification-item">
+          <div class="notification-title">New Pickup Scheduled</div>
+          <div class="notification-message">
+            You have successfully scheduled a new pickup.
+          </div>
+          <div class="notification-timestamp">2024-11-10 14:45 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+        update,
+        push,
+        set,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { postNotification } from "./notifications.js";
+      import { fetchNotifications } from "./notifications.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const userUid = localStorage.getItem("userUid");
+        const userRole = localStorage.getItem("userRole");
+
+        const notificationsContainer = document.getElementById(
+          "notifications-container"
+        );
+
+        if (userUid && notificationsContainer) {
+          await fetchNotifications(userUid, notificationsContainer);
+        }
+
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        }
+      });
+    </script>
+    <script>
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>
