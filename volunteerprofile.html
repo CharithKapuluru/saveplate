@@ -32,7 +32,7 @@
       .profile-container label {
         font-weight: bold;
         color: #2d3748;
-        margin-top: 1.5rem; /* Added margin to create space between elements */
+        margin-top: 1.5rem;
         display: block;
       }
       .profile-container input,
@@ -45,17 +45,18 @@
         border-radius: 8px;
         box-sizing: border-box;
       }
+      /* Modified for better contrast */
       .profile-container .submit-btn {
-        background-color: #87a330;
+        background-color: #1b4332;
         color: white;
         padding: 12px 20px;
         border-radius: 8px;
         transition: background-color 0.3s, transform 0.3s;
-        margin-top: 2rem; /* Added margin for better spacing */
+        margin-top: 2rem;
         width: 100%;
       }
       .profile-container .submit-btn:hover {
-        background-color: #4e7d16;
+        background-color: #0f2c21;
         transform: translateY(-3px);
       }
       .badge,
@@ -68,13 +69,33 @@
         margin-bottom: 1rem;
       }
       .badges-certificates-container {
-        margin-top: 3rem; /* Create space above badges and certificates section */
+        margin-top: 3rem;
       }
       .badges-certificates-container h2 {
         font-size: 1.8rem;
         color: #4e7d16;
         font-weight: bold;
         margin-bottom: 1rem;
+      }
+      /* Navigation styles with better contrast */
+      .nav-link {
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+      }
+      .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 0.375rem;
+      }
+      .signout-btn {
+        background-color: #1b4332;
+        color: #ffffff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        font-weight: 600;
+      }
+      .signout-btn:hover {
+        background-color: #0f2c21;
       }
     </style>
   </head>
@@ -158,7 +179,6 @@
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
       import { postNotification } from "./notifications.js";
 
-      // Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
         authDomain: "saveplate-c246d.firebaseapp.com",
@@ -170,19 +190,16 @@
         databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
       };
 
-      // Initialize Firebase and attach services to the window object
       const app = initializeApp(firebaseConfig);
       window.database = getDatabase(app);
       window.auth = getAuth(app);
 
-      // Attach Firebase services to the window object for global access
       window.firebaseApp = app;
       window.database = database;
       window.auth = auth;
       window.ref = ref;
       window.update = update;
 
-      // Fetch and display the current user's profile data
       function loadVolunteerProfile() {
         onAuthStateChanged(auth, async (user) => {
           if (user) {
@@ -200,10 +217,9 @@
               document.getElementById("preferred-locations").value =
                 userData.preferredLocations || "";
 
-              // Load badges if available
               if (userData.badges) {
                 const badgeListElement = document.getElementById("badge-list");
-                badgeListElement.innerHTML = ""; // Clear existing badges
+                badgeListElement.innerHTML = "";
                 userData.badges.forEach((badge) => {
                   const badgeDiv = document.createElement("div");
                   badgeDiv.classList.add("badge");
@@ -212,11 +228,10 @@
                 });
               }
 
-              // Load certificates if available
               if (userData.certificates) {
                 const certificateListElement =
                   document.getElementById("certificate-list");
-                certificateListElement.innerHTML = ""; // Clear existing certificates
+                certificateListElement.innerHTML = "";
                 userData.certificates.forEach((certificate) => {
                   const certificateDiv = document.createElement("div");
                   certificateDiv.classList.add("certificate");
@@ -228,20 +243,16 @@
               console.log("No data available");
             }
           } else {
-            // If no user is signed in, redirect to the login page
             window.location.href = "index.html";
           }
         });
       }
 
-      // Attach loadProfile to the window object for global access
       window.loadVolunteerProfile = loadVolunteerProfile;
 
       document.addEventListener("DOMContentLoaded", function () {
-        // Load the profile when the page loads
         loadVolunteerProfile();
 
-        // Load the appropriate navbar for the volunteer
         const userRole = localStorage.getItem("userRole");
         if (userRole === "Volunteer") {
           fetch("volunteerNavbar.html")
@@ -260,24 +271,20 @@
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Define the saveVolunteerProfile function globally
         function saveVolunteerProfile() {
           const auth = window.auth;
           const database = window.database;
 
           const volunteerName = document.getElementById("volunteer-name").value;
-          const volunteerEmail =
-            document.getElementById("volunteer-email").value;
+          const volunteerEmail = document.getElementById("volunteer-email").value;
           const phoneNumber = document.getElementById("volunteer-phone").value;
           const preferredLocations = document.getElementById(
             "preferred-locations"
           ).value;
 
-          // Check if user is authenticated
           const user = auth.currentUser;
           if (user) {
             const userUid = user.uid;
-            // Update user's profile information in Firebase Database
             const userRef = window.ref(window.database, "users/" + userUid);
             window
               .update(userRef, {
@@ -297,12 +304,10 @@
                 alert("Failed to update profile. Please try again.");
               });
           } else {
-            // If no user is signed in, redirect to the login page
             window.location.href = "index.html";
           }
         }
 
-        // Attach saveVolunteerProfile to the window object if needed
         window.saveVolunteerProfile = saveVolunteerProfile;
       });
 
