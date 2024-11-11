@@ -8,6 +8,20 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
+    <style>
+      /* Added to ensure proper link contrast */
+      .nav-link {
+        color: #1b4332;
+        font-weight: 600;
+      }
+      .card-link {
+        color: #1b4332;
+        text-decoration: underline;
+      }
+      .card-link:hover {
+        color: #0f2c21;
+      }
+    </style>
   </head>
   <body class="bg-green-100 min-h-screen">
     <!-- Navbar -->
@@ -27,66 +41,7 @@
         Manage your inventory, post surplus food, handle donation requests, and
         keep track of your waste logging and messaging—all from one place.
       </p>
-      <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-bold text-green-700 mb-4">
-            Inventory Management
-          </h3>
-          <p class="text-gray-700 mb-4">
-            Track and manage your inventory effectively to minimize food waste.
-          </p>
-          <a
-            href="inventoryManagement.html"
-            class="text-green-600 hover:underline"
-          >
-            Go to Inventory Management &rarr;
-          </a>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-bold text-green-700 mb-4">
-            Surplus Food Posting
-          </h3>
-          <p class="text-gray-700 mb-4">
-            Post details of surplus food available for donation.
-          </p>
-          <a href="foodposting.html" class="text-green-600 hover:underline">
-            Post Surplus Food &rarr;
-          </a>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-bold text-green-700 mb-4">
-            Donation Requests
-          </h3>
-          <p class="text-gray-700 mb-4">
-            Manage requests for food donations and collaborate with volunteers.
-          </p>
-          <a
-            href="donationrequests.html"
-            class="text-green-600 hover:underline"
-          >
-            View Donation Requests &rarr;
-          </a>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-bold text-green-700 mb-4">Waste Logging</h3>
-          <p class="text-gray-700 mb-4">
-            Log food waste and keep track of waste reduction initiatives.
-          </p>
-          <a href="wastelogging.html" class="text-green-600 hover:underline">
-            Log Waste &rarr;
-          </a>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-bold text-green-700 mb-4">Messaging</h3>
-          <p class="text-gray-700 mb-4">
-            Communicate with volunteers and other restaurant managers for better
-            collaboration.
-          </p>
-          <a href="messaging.html" class="text-green-600 hover:underline">
-            Open Messaging &rarr;
-          </a>
-        </div>
-      </div> -->
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column for Data Insights -->
         <div
@@ -104,7 +59,7 @@
           </p>
           <a
             href="datainsights.html"
-            class="text-green-600 hover:underline block"
+            class="card-link"
           >
             Go to Data Insights &rarr;
           </a>
@@ -124,7 +79,7 @@
             </p>
             <a
               href="inventoryManagement.html"
-              class="text-green-600 hover:underline"
+              class="card-link"
             >
               Go to Inventory Management &rarr;
             </a>
@@ -136,7 +91,7 @@
             <p class="text-gray-700 mb-4">
               Post details of surplus food available for donation.
             </p>
-            <a href="foodposting.html" class="text-green-600 hover:underline">
+            <a href="foodposting.html" class="card-link">
               Post Surplus Food &rarr;
             </a>
           </div>
@@ -150,7 +105,7 @@
             </p>
             <a
               href="donationrequests.html"
-              class="text-green-600 hover:underline"
+              class="card-link"
             >
               View Donation Requests &rarr;
             </a>
@@ -160,7 +115,7 @@
             <p class="text-gray-700 mb-4">
               Log food waste and keep track of waste reduction initiatives.
             </p>
-            <a href="wastelogging.html" class="text-green-600 hover:underline">
+            <a href="wastelogging.html" class="card-link">
               Log Waste &rarr;
             </a>
           </div>
@@ -170,7 +125,7 @@
               Communicate with volunteers and other restaurant managers for
               better collaboration.
             </p>
-            <a href="messaging.html" class="text-green-600 hover:underline">
+            <a href="messaging.html" class="card-link">
               Open Messaging &rarr;
             </a>
           </div>
