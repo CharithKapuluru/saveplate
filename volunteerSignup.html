@@ -11,8 +11,97 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+      body {
+        background-color: #f0fdf4;
+        color: #1b4332;
+        font-family: 'Arial', sans-serif;
+      }
+
+      .form-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 32px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0 20px 0;
+        border: 2px solid #1b4332;
+        border-radius: 8px;
+        font-size: 16px;
+        color: #1b4332;
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #2d6a4f;
+        box-shadow: 0 0 0 2px #b7e4c7;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        color: #1b4332;
+        margin-bottom: 8px;
+      }
+
+      .btn-primary {
+        background-color: #1b4332;
+        color: #ffffff;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: #2d6a4f;
+      }
+
+      .link-text {
+        color: #1b4332;
+        text-decoration: underline;
+        font-weight: 500;
+      }
+
+      .link-text:hover {
+        color: #2d6a4f;
+      }
+
+      .error-text {
+        color: #dc2626;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+
+      .main-title {
+        color: #1b4332;
+        font-size: 32px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .sub-title {
+        color: #1b4332;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+    </style>
     <script type="module">
-      // Firebase imports and configuration remain the same
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         getAuth,
@@ -24,9 +113,6 @@
         ref,
         set,
         get,
-        child,
-        update,
-        remove,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
       const firebaseConfig = {
@@ -40,210 +126,190 @@
         databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const database = getDatabase(app);
       const auth = getAuth(app);
 
-      // Function implementations remain the same
-      window.signUp = async function () {
+      window.signUp = async function() {
         const email = document.getElementById("signup-email").value;
         const password = document.getElementById("signup-password").value;
         const name = document.getElementById("signup-name").value;
         const signupError = document.getElementById("signup-error");
+
         try {
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
-          const role = "Volunteer";
-          await set(ref(database, "users/" + user.uid), {
+          await set(ref(database, 'users/' + user.uid), {
             name: name,
             email: email,
-            role: role,
+            role: 'Volunteer'
           });
-          localStorage.setItem("userRole", role);
+          
           signupError.textContent = "Account created successfully. Please sign in.";
-          toggleForm('signin');
+          signupError.style.color = "#059669";
+          setTimeout(() => {
+            toggleForm('signin');
+          }, 2000);
         } catch (error) {
           signupError.textContent = error.message;
+          signupError.style.color = "#dc2626";
         }
       };
 
-      window.signIn = async function () {
+      window.signIn = async function() {
         const email = document.getElementById("signin-email").value;
         const password = document.getElementById("signin-password").value;
         const signinError = document.getElementById("signin-error");
+
         try {
-          const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
-          const userSnapshot = await get(ref(database, "users/" + user.uid));
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.val();
-            const userRole = userData.role;
-            localStorage.setItem("userUid", user.uid);
-            localStorage.setItem("userRole", userRole);
-            signinError.textContent = "Sign in successful.";
+          const snapshot = await get(ref(database, 'users/' + user.uid));
+          
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            localStorage.setItem('userRole', userData.role);
+            localStorage.setItem('userUid', user.uid);
             window.location.href = "volunteerhome.html";
           } else {
-            signinError.textContent = "No user data found.";
+            signinError.textContent = "User data not found.";
           }
         } catch (error) {
           signinError.textContent = error.message;
         }
       };
 
-      window.toggleForm = function (formType) {
-        if (formType === "signup") {
-          document.getElementById("signup-form").style.display = "block";
-          document.getElementById("signin-form").style.display = "none";
+      window.toggleForm = function(formType) {
+        const signupForm = document.getElementById("signup-form");
+        const signinForm = document.getElementById("signin-form");
+        const signupError = document.getElementById("signup-error");
+        const signinError = document.getElementById("signin-error");
+
+        if (formType === 'signup') {
+          signupForm.style.display = 'block';
+          signinForm.style.display = 'none';
         } else {
-          document.getElementById("signup-form").style.display = "none";
-          document.getElementById("signin-form").style.display = "block";
+          signupForm.style.display = 'none';
+          signinForm.style.display = 'block';
         }
+
+        // Clear errors and form fields
+        signupError.textContent = '';
+        signinError.textContent = '';
       };
     </script>
-    <style>
-      .form-label {
-        @apply block text-sm font-medium text-gray-700 mb-1;
-      }
-      .form-input {
-        @apply w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500;
-      }
-      .btn-primary {
-        @apply w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
-      }
-      .link-text {
-        @apply text-green-700 hover:text-green-800 hover:underline focus:outline-none focus:ring-2 focus:ring-green-500;
-      }
-    </style>
   </head>
-  <body class="bg-green-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-4xl p-8 space-y-8 bg-white rounded-lg shadow-md flex">
-      <div class="hidden md:block w-1/2">
-        <img
-          src="loginimage.jpg"
-          alt="Food donation volunteer work"
-          class="w-full h-full object-cover rounded-lg"
-        />
-      </div>
-      <div class="w-full md:w-1/2 max-w-md p-8 space-y-8">
-        <h1 class="text-3xl font-bold text-center text-green-800">
-          Save Plate - Volunteer
-        </h1>
+  <body>
+    <div class="form-container">
+      <h1 class="main-title">Save Plate - Volunteer</h1>
+      
+      <!-- Sign Up Form -->
+      <form id="signup-form" novalidate>
+        <h2 class="sub-title">Sign Up</h2>
+        
+        <div>
+          <label for="signup-name" class="form-label">Name</label>
+          <input
+            type="text"
+            id="signup-name"
+            class="form-input"
+            required
+            aria-required="true"
+          />
+        </div>
 
-        <!-- Sign Up Form -->
-        <form id="signup-form" class="space-y-6" novalidate>
-          <h2 class="text-2xl font-semibold text-green-800 mb-4">Sign Up</h2>
-          <div class="space-y-4">
-            <div>
-              <label for="signup-name" class="form-label">Name</label>
-              <input
-                type="text"
-                id="signup-name"
-                name="signup-name"
-                class="form-input"
-                required
-                aria-required="true"
-              />
-            </div>
-            <div>
-              <label for="signup-email" class="form-label">Email</label>
-              <input
-                type="email"
-                id="signup-email"
-                name="signup-email"
-                class="form-input"
-                required
-                aria-required="true"
-              />
-            </div>
-            <div>
-              <label for="signup-password" class="form-label">Password</label>
-              <input
-                type="password"
-                id="signup-password"
-                name="signup-password"
-                class="form-input"
-                required
-                aria-required="true"
-                minlength="6"
-              />
-            </div>
-            <p id="signup-error" class="text-red-600" role="alert" aria-live="polite"></p>
-            <button
-              type="button"
-              onclick="signUp()"
-              class="btn-primary"
-            >
-              Sign Up
-            </button>
-            <p class="text-center text-gray-700">
-              Have an account already?
-              <button 
-                type="button"
-                onclick="toggleForm('signin')"
-                class="link-text"
-              >
-                Sign In
-              </button>
-            </p>
-          </div>
-        </form>
+        <div>
+          <label for="signup-email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="signup-email"
+            class="form-input"
+            required
+            aria-required="true"
+          />
+        </div>
 
-        <!-- Sign In Form -->
-        <form id="signin-form" class="space-y-6" style="display: none" novalidate>
-          <h2 class="text-2xl font-semibold text-green-800 mb-4">Sign In</h2>
-          <div class="space-y-4">
-            <div>
-              <label for="signin-email" class="form-label">Email</label>
-              <input
-                type="email"
-                id="signin-email"
-                name="signin-email"
-                class="form-input"
-                required
-                aria-required="true"
-              />
-            </div>
-            <div>
-              <label for="signin-password" class="form-label">Password</label>
-              <input
-                type="password"
-                id="signin-password"
-                name="signin-password"
-                class="form-input"
-                required
-                aria-required="true"
-              />
-            </div>
-            <p id="signin-error" class="text-red-600" role="alert" aria-live="polite"></p>
-            <button
-              type="button"
-              onclick="signIn()"
-              class="btn-primary"
-            >
-              Sign In
-            </button>
-            <p class="text-center text-gray-700">
-              Don't have an account?
-              <button 
-                type="button"
-                onclick="toggleForm('signup')"
-                class="link-text"
-              >
-                Sign Up
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
+        <div>
+          <label for="signup-password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="signup-password"
+            class="form-input"
+            required
+            aria-required="true"
+            minlength="6"
+          />
+        </div>
+
+        <p id="signup-error" role="alert" aria-live="polite" class="error-text"></p>
+
+        <button
+          type="button"
+          onclick="signUp()"
+          class="btn-primary"
+        >
+          Sign Up
+        </button>
+
+        <p style="text-align: center; margin-top: 20px;">
+          Have an account already?
+          <button 
+            type="button"
+            onclick="toggleForm('signin')"
+            class="link-text"
+          >
+            Sign In
+          </button>
+        </p>
+      </form>
+
+      <!-- Sign In Form -->
+      <form id="signin-form" style="display: none;" novalidate>
+        <h2 class="sub-title">Sign In</h2>
+
+        <div>
+          <label for="signin-email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="signin-email"
+            class="form-input"
+            required
+            aria-required="true"
+          />
+        </div>
+
+        <div>
+          <label for="signin-password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="signin-password"
+            class="form-input"
+            required
+            aria-required="true"
+          />
+        </div>
+
+        <p id="signin-error" role="alert" aria-live="polite" class="error-text"></p>
+
+        <button
+          type="button"
+          onclick="signIn()"
+          class="btn-primary"
+        >
+          Sign In
+        </button>
+
+        <p style="text-align: center; margin-top: 20px;">
+          Don't have an account?
+          <button 
+            type="button"
+            onclick="toggleForm('signup')"
+            class="link-text"
+          >
+            Sign Up
+          </button>
+        </p>
+      </form>
     </div>
   </body>
 </html>
