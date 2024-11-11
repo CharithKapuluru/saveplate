@@ -143,11 +143,11 @@
         border-spacing: 0 15px;
         width: 100%;
         margin-top: 20px;
-        background-color: #dff3e4; /* Light green shade from the body background */
+        background-color: #dff3e4;
       }
 
       th {
-        background-color: #a8d996; /* Darker green shade from the body background */
+        background-color: #2d3748;
         color: #ffffff;
         padding: 12px;
         border-radius: 10px 10px 0 0;
@@ -155,11 +155,11 @@
       }
 
       td {
-        background-color: #fffdfb; /* Keep a white background for readability */
+        background-color: #fffdfb;
         color: #1a202c;
         padding: 20px;
         border-radius: 5px;
-        border: 1px solid #a8d5ba; /* Border color to match table consistency */
+        border: 1px solid #a8d5ba;
       }
 
       .btn {
@@ -176,10 +176,42 @@
       }
 
       .food-posts-container {
-        background: #a8d5ba; /* Darker green shade */
+        background: #a8d5ba;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-link {
+        color: white;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #a8d5ba;
+      }
+
+      .signout-btn {
+        background-color: #c53030;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s;
+      }
+
+      .signout-btn:hover {
+        background-color: #9b2c2c;
+      }
+
+      .signout-btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
       }
     </style>
   </head>
@@ -187,7 +219,15 @@
     <header class="bg-green-700 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
-        <div id="navbar-container"></div>
+        <div class="flex items-center space-x-4">
+          <div id="navbar-container" class="flex items-center space-x-4"></div>
+          <button onclick="signOut()" class="signout-btn">
+            <span>Sign Out</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -200,13 +240,13 @@
         <table class="min-w-full bg-white rounded-lg shadow-lg">
           <thead>
             <tr class="text-white">
-              <th class="py-4 px-6 border-b text-left text-sm font-semibold bg-slate-800 text-white">
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
                 Item Name
               </th>
-              <th class="py-4 px-6 border-b text-left text-sm font-semibold bg-slate-800 text-white">
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
                 Quantity
               </th>
-              <th class="py-4 px-6 border-b text-left text-sm font-semibold bg-slate-800 text-white">
+              <th class="py-4 px-6 border-b text-left text-sm font-semibold">
                 Expiry Date
               </th>
               <th class="py-4 px-6 border-b text-left text-sm font-semibold">
