@@ -45,7 +45,6 @@
         border-radius: 8px;
         box-sizing: border-box;
       }
-      /* Modified for better contrast */
       .profile-container .submit-btn {
         background-color: #1b4332;
         color: white;
@@ -77,7 +76,6 @@
         font-weight: bold;
         margin-bottom: 1rem;
       }
-      /* Navigation styles with better contrast */
       .nav-link {
         color: #ffffff;
         font-weight: 600;
@@ -87,22 +85,25 @@
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 0.375rem;
       }
-      .signout-btn {
-        background-color: #1b4332;
+      /* Updated sign out button style for better contrast */
+      .header-signout-btn {
+        background-color: #06201b;
         color: #ffffff;
         padding: 0.75rem 1.5rem;
         border-radius: 0.375rem;
         font-weight: 600;
+        transition: background-color 0.2s;
+        display: inline-block;
       }
-      .signout-btn:hover {
-        background-color: #0f2c21;
+      .header-signout-btn:hover {
+        background-color: #031410;
       }
     </style>
   </head>
   <body class="bg-green-100 min-h-screen">
     <!-- Navbar -->
     <header class="bg-green-700 text-white py-4">
-      <div class="container mx-auto flex justify-between items-center">
+      <div class="container mx-auto flex justify-between items-center px-4">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
       </div>
@@ -258,13 +259,23 @@
           fetch("volunteerNavbar.html")
             .then((response) => response.text())
             .then((data) => {
-              document.getElementById("navbar-container").innerHTML = data;
+              // Modify the fetched HTML to use the new button class
+              const modifiedData = data.replace(
+                'class="signout-btn"',
+                'class="header-signout-btn"'
+              );
+              document.getElementById("navbar-container").innerHTML = modifiedData;
             });
         } else {
           fetch("managerNavbar.html")
             .then((response) => response.text())
             .then((data) => {
-              document.getElementById("navbar-container").innerHTML = data;
+              // Modify the fetched HTML to use the new button class
+              const modifiedData = data.replace(
+                'class="signout-btn"',
+                'class="header-signout-btn"'
+              );
+              document.getElementById("navbar-container").innerHTML = modifiedData;
             });
         }
       });
