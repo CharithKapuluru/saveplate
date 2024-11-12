@@ -11,7 +11,7 @@
 
     <style>
       body {
-        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        background: linear-gradient(to bottom, #2F855A, #9AE6B4);
         color: #1a202c;
         font-family: "Arial", sans-serif;
       }
@@ -19,20 +19,20 @@
       .btn-log-waste {
         transition: background-color 0.3s, transform 0.3s;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        background-color: #4e7d16; 
+        background-color: #276749; /* Darker green for better contrast */
         color: white;
       }
 
       .btn-log-waste:hover {
-        background-color: #3a5f11;
+        background-color: #1C4532;
         transform: translateY(-2px);
       }
 
       .waste-container {
-        max-width: 70%; 
+        max-width: 70%;
         margin-top: 20px;
         padding: 20px;
-        background: #a8d5ba; 
+        background: #F0FFF4; /* Lighter background for better contrast */
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
       }
@@ -42,11 +42,11 @@
         border-spacing: 0 15px;
         width: 100%;
         margin-top: 20px;
-        background-color: #dff3e4; 
+        background-color: #F0FFF4;
       }
 
       th {
-        background-color: #a8d996; 
+        background-color: #276749; /* Darker green for better contrast */
         color: #ffffff;
         padding: 12px;
         border-radius: 10px 10px 0 0;
@@ -54,38 +54,55 @@
       }
 
       td {
-        background-color: #fffdfb; /* Keep a white background for readability */
+        background-color: #ffffff;
         color: #1a202c;
         padding: 20px;
         border-radius: 5px;
-        border: 1px solid #a8d5ba; /* Border color to match table consistency */
+        border: 1px solid #2F855A;
       }
 
       .btn-delete {
         transition: background-color 0.3s, transform 0.3s;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #C53030; /* Red color for better contrast */
+        color: white;
       }
 
       .btn-delete:hover {
+        background-color: #9B2C2C;
         transform: translateY(-2px);
       }
 
       header {
         margin-bottom: 20px;
+        background-color: #276749; /* Darker green for better contrast */
       }
 
       .form-container {
-        margin: 0 auto; /* Center the form container */
+        margin: 0 auto;
       }
 
       .waste-log-table-container {
-        max-width: 900px; /* Reduce the width of the waste log table */
-        margin: 0 auto; /* Center the table */
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      /* High contrast text styles */
+      .text-heading {
+        color: #276749; /* Dark green for headings */
+      }
+
+      .text-content {
+        color: #2D3748; /* Dark gray for content */
+      }
+
+      .form-label {
+        color: #1A202C; /* Very dark gray for form labels */
       }
     </style>
   </head>
-  <body class="bg-green-100 min-h-screen">
-    <header class="bg-green-700 text-white py-4">
+  <body class="min-h-screen">
+    <header class="text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
@@ -93,17 +110,17 @@
     </header>
 
     <div class="waste-container mx-auto py-8">
-      <h1 class="text-3xl font-bold mb-4 text-green-700 text-center">
+      <h1 class="text-3xl font-bold mb-4 text-heading text-center">
         Waste Logging
       </h1>
-      <p class="mb-6 text-center">
+      <p class="mb-6 text-content text-center">
         Log discarded food items by recording quantities and reasons for
         disposal.
       </p>
 
       <form id="waste-log-form" onsubmit="logWaste(event)" class="space-y-6">
         <div>
-          <label for="item_id" class="block text-sm font-medium text-gray-700"
+          <label for="item_id" class="block text-sm font-medium form-label"
             >Select Item</label
           >
           <select
@@ -117,7 +134,7 @@
         </div>
 
         <div>
-          <label for="quantity" class="block text-sm font-medium text-gray-700"
+          <label for="quantity" class="block text-sm font-medium form-label"
             >Quantity</label
           >
           <input
@@ -131,7 +148,7 @@
         </div>
 
         <div>
-          <label for="reason" class="block text-sm font-medium text-gray-700"
+          <label for="reason" class="block text-sm font-medium form-label"
             >Reason for Disposal</label
           >
           <textarea
@@ -148,11 +165,11 @@
       </form>
 
       <div class="waste-log-table-container mx-auto mt-10">
-        <h2 class="text-2xl font-semibold mb-4 text-center">Historical Waste Logs</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-heading text-center">Historical Waste Logs</h2>
         <div class="overflow-x-auto">
-          <table class="min-w-full bg-white rounded-lg shadow-lg">
+          <table class="min-w-full rounded-lg shadow-lg">
             <thead>
-              <tr class="text-white">
+              <tr>
                 <th>Item</th>
                 <th>Quantity</th>
                 <th>Reason</th>
@@ -166,6 +183,7 @@
           </table>
         </div>
       </div>
+    </div>
   </body>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -216,27 +234,21 @@
         });
     };
 
-    // Function to log waste into Firebase
     // Function to log waste into Firebase and update the inventory
     window.logWaste = async function logWaste(event) {
-      event.preventDefault(); // Prevent form submission from reloading the page
+      event.preventDefault();
       const itemId = document.getElementById("item_id").value;
       const quantity = parseFloat(document.getElementById("quantity").value);
       const reason = document.getElementById("reason").value;
 
       if (itemId && quantity && reason) {
         try {
-          // Retrieve the selected item name from the dropdown
           const itemElement = document.getElementById("item_id");
-          const itemName =
-            itemElement.options[itemElement.selectedIndex].text.split(
-              " (Quantity:"
-            )[0];
+          const itemName = itemElement.options[itemElement.selectedIndex].text.split(" (Quantity:")[0];
 
-          // Log waste to "wasteLogs" in Firebase
           const wasteLogRef = ref(db, "wasteLogs");
           const newWasteLogRef = push(wasteLogRef);
-          const currentDate = new Date().toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+          const currentDate = new Date().toISOString().split("T")[0];
 
           await set(newWasteLogRef, {
             item_id: itemId,
@@ -246,16 +258,12 @@
             date_logged: currentDate,
           });
 
-          // Update inventory quantity in Firebase
           const inventoryItemRef = ref(db, `inventory/${itemId}`);
           const inventorySnapshot = await get(inventoryItemRef);
 
           if (inventorySnapshot.exists()) {
-            const currentQuantity = parseFloat(
-              inventorySnapshot.val().quantity
-            );
+            const currentQuantity = parseFloat(inventorySnapshot.val().quantity);
 
-            // Ensure inventory quantity doesn't become negative
             if (quantity > currentQuantity) {
               alert("Error: Quantity to log exceeds available inventory.");
               return;
@@ -269,10 +277,8 @@
             });
           }
 
-          // Refresh waste logs and reset form fields
           getWasteLogs();
           document.getElementById("waste-log-form").reset();
-
           alert("Waste logged successfully and inventory updated.");
         } catch (error) {
           console.error("Error logging waste or updating inventory: ", error);
@@ -286,7 +292,7 @@
       const dbRef = ref(db, "wasteLogs");
       onValue(dbRef, (snapshot) => {
         const tableBody = document.getElementById("waste-log-entries");
-        tableBody.innerHTML = ""; // Clear current entries
+        tableBody.innerHTML = "";
 
         if (snapshot.exists()) {
           snapshot.forEach((childSnapshot) => {
@@ -299,7 +305,7 @@
               <td class="border px-6 py-4">${log.reason}</td>
               <td class="border px-6 py-4">${log.date_logged}</td>
               <td class="border px-6 py-4">
-                <button class="btn-delete bg-green-600 text-white font-semibold hover:bg-green-800 py-2 px-4 rounded" onclick="deleteWasteLog('${childSnapshot.key}')">
+                <button class="btn-delete px-4 py-2 rounded font-semibold" onclick="deleteWasteLog('${childSnapshot.key}')">
                   Delete
                 </button>
               </td>
@@ -307,10 +313,9 @@
             tableBody.appendChild(row);
           });
         } else {
-          // Show a message if no logs are found
           tableBody.innerHTML = `
             <tr>
-              <td colspan="5" class="text-center py-4">No waste logs available.</td>
+              <td colspan="5" class="text-center py-4 text-content">No waste logs available.</td>
             </tr>
           `;
         }
@@ -323,7 +328,7 @@
         const logRef = ref(db, `wasteLogs/${logId}`);
         await remove(logRef);
         alert("Waste log deleted successfully.");
-        getWasteLogs(); // Refresh logs after deletion
+        getWasteLogs();
       } catch (error) {
         console.error("Error deleting waste log: ", error);
         alert("Error deleting waste log. Please try again.");
@@ -332,7 +337,6 @@
 
     // Initial rendering of the inventory and waste logs
     document.addEventListener("DOMContentLoaded", function () {
-      // Load navbar
       const userRole = localStorage.getItem("userRole");
 
       if (userRole === "Restaurant Manager") {
@@ -349,7 +353,6 @@
           });
       }
 
-      // Load inventory items and waste logs
       getInventoryItems();
       getWasteLogs();
     });
