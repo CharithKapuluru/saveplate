@@ -150,18 +150,18 @@
           row.className = "hover:bg-gray-50 transition-colors duration-200";
           
           row.innerHTML = `
-            <td class="px-6 py-4">${item.name}</td>
-            <td class="px-6 py-4">${item.quantity}</td>
-            <td class="px-6 py-4">${item.expiryDate}</td>
-            <td class="px-6 py-4">
+            <td class="px-6 py-4 bg-white">${item.name}</td>
+            <td class="px-6 py-4 bg-white">${item.quantity}</td>
+            <td class="px-6 py-4 bg-white">${item.expiryDate}</td>
+            <td class="px-6 py-4 bg-white">
               <div class="flex space-x-3">
-                <button id="edit-${item.id}" class="action-button edit-button">
+                <button id="edit-${item.id}" class="action-button edit-button hover:scale-105 transition-transform duration-200">
                   Edit
                 </button>
-                <button id="delete-${item.id}" class="action-button delete-button">
+                <button id="delete-${item.id}" class="action-button delete-button hover:scale-105 transition-transform duration-200">
                   Delete
                 </button>
-                <button id="post-${item.id}" class="action-button post-button">
+                <button id="post-${item.id}" class="action-button post-button hover:scale-105 transition-transform duration-200">
                   Post
                 </button>
               </div>
@@ -342,10 +342,12 @@
 
       th:first-child {
         border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
       }
 
       th:last-child {
         border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
       }
 
       tr {
@@ -407,6 +409,7 @@
         padding: 2rem;
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 2rem;
       }
 
       .modal-open {
@@ -457,13 +460,23 @@
       input[type="date"]:focus {
         outline: none;
         border-color: #004d00;
-        ring: 2px;
-        ring-color: rgba(0, 77, 0, 0.2);
+        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
+      }
+
+      .btn {
+        transition: all 0.3s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .hover-shadow:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
   <body class="min-h-screen">
-    <header class="bg-[#004d00] text-white py-4">
+    <header class="bg-[#004d00] text-white py-4 shadow-lg">
       <div class="container mx-auto flex justify-between items-center px-4">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
@@ -472,4 +485,83 @@
 
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text
+        <h2 class="text-3xl font-bold text-gray-800">Inventory Management</h2>
+        <button
+          id="addItemButton"
+          class="bg-[#004d00] hover:bg-[#003300] text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+        >
+          + Add New Item
+        </button>
+      </div>
+
+      <div class="inventory-container">
+        <table class="w-full">
+          <thead>
+            <tr>
+              <th class="py-4 px-6">Item Name</th>
+              <th class="py-4 px-6">Quantity</th>
+              <th class="py-4 px-6">Expiry Date</th>
+              <th class="py-4 px-6">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable">
+            <!-- Dynamic content will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Item Popup -->
+    <div id="addItemPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="popup-content fade-in">
+        <h3 class="text-2xl font-bold mb-6 text-gray-800 text-center">Add New Item</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="itemName" class="block text-sm font-medium text-gray-700">Item Name</label>
+            <input type="text" id="itemName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
+          </div>
+          <div>
+            <label for="itemQuantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+            <input type="number" id="itemQuantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
+          </div>
+          <div>
+            <label for="itemExpiryDate" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+            <input type="date" id="itemExpiryDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end space-x-4">
+          <button onclick="closeAddItemPopup()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+            Cancel
+          </button>
+          <button id="saveItemButton" class="btn bg-[#004d00] hover:bg-[#003300] text-white px-6 py-2 rounded-lg transition duration-300">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post Item Popup -->
+    <div id="postItemPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="popup-content fade-in">
+        <h3 class="text-2xl font-bold mb-6 text-gray-800 text-center">Post Item for Donation</h3>
+        <div>
+          <label for="postQuantity" class="block text-sm font-medium text-gray-700">Quantity to Post</label>
+          <input 
+            type="number" 
+            id="postQuantity" 
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
+            min="1"
+          />
+        </div>
+        <div class="mt-6 flex justify-end space-x-4">
+          <button onclick="closePostItemPopup()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+            Cancel
+          </button>
+          <button id="confirmPostButton" class="btn bg-[#004d00] hover:bg-[#003300] text-white px-6 py-2 rounded-lg transition duration-300">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
