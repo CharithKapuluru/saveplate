@@ -12,7 +12,7 @@
     <style>
       body {
         background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
-        color: #1a202c;
+        color: #1a1a1a; /* Increased contrast for body text */
         font-family: "Arial", sans-serif;
       }
       .pickups-container {
@@ -21,8 +21,8 @@
         padding: 20px;
       }
       .pickup-card {
-        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
-        color: #1a202c;
+        background: linear-gradient(to bottom right, #d1e0e5, #a0bfcf); /* Updated colors for contrast */
+        color: #0a0a0a; /* Increased text contrast */
         border-radius: 12px;
         padding: 20px;
         width: 100%;
@@ -35,25 +35,31 @@
       }
       .pickup-title {
         font-size: 1.8rem;
-        color: #4e7d16;
+        color: #345b24; /* Updated for better contrast */
         font-weight: bold;
         margin-bottom: 0.5rem;
       }
       .pickup-details {
         font-size: 1.2rem;
-        color: #2d3748;
+        color: #0a0a0a; /* Increased contrast */
         margin-bottom: 1rem;
       }
       .pickedup-button {
-        background-color: #4e7d16;
-        color: white;
+        background-color: #345b24; /* Darker green for better contrast */
+        color: #ffffff;
         padding: 10px 20px;
         border-radius: 8px;
         transition: background-color 0.3s, transform 0.3s;
       }
       .pickedup-button:hover {
-        background-color: #3b6b14;
+        background-color: #27481d;
         transform: translateY(-3px);
+      }
+      .text-green-700 {
+        color: #234c21; /* Darker green for better contrast */
+      }
+      .text-center {
+        text-align: center;
       }
     </style>
   </head>
@@ -72,8 +78,6 @@
         My Pickup Schedule
       </h1>
 
-      <!-- <div id="pickupList" class="space-y-6">
-      </div> -->
       <h2 class="text-2xl font-bold mb-4 text-green-700">Upcoming Pickups</h2>
       <div id="upcomingPickupList" class="space-y-6">
         <!-- Upcoming pickups will be dynamically inserted here -->
@@ -100,16 +104,14 @@
       import { showToast } from "./notification.js";
       import { postNotification } from "./notifications.js";
 
-      // Check if there is a notification message in localStorage
       document.addEventListener("DOMContentLoaded", () => {
         const notificationMessage = localStorage.getItem("notificationMessage");
         if (notificationMessage) {
           showToast(notificationMessage);
-          localStorage.removeItem("notificationMessage"); // Remove after showing the notification
+          localStorage.removeItem("notificationMessage");
         }
       });
 
-      // Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
         authDomain: "saveplate-c246d.firebaseapp.com",
@@ -121,11 +123,9 @@
         databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const database = getDatabase(app);
 
-      // Attach Firebase functions to the window object for global access
       window.database = database;
       window.ref = ref;
       window.get = get;
@@ -135,7 +135,6 @@
       window.push = push;
       window.set = set;
 
-      // Fetch pickup schedule from Firebase
       async function fetchPickupSchedule() {
         try {
           const userUid = localStorage.getItem("userUid");
@@ -153,8 +152,8 @@
             return;
           }
 
-          upcomingPickupList.innerHTML = ""; // Clear existing upcoming pickups
-          completedPickupList.innerHTML = ""; // Clear existing completed pickups
+          upcomingPickupList.innerHTML = "";
+          completedPickupList.innerHTML = "";
 
           if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
@@ -192,7 +191,6 @@
       document.addEventListener("DOMContentLoaded", function () {
         fetchPickupSchedule();
 
-        // Load the appropriate navbar for the volunteer
         const userRole = localStorage.getItem("userRole");
         if (userRole === "Volunteer") {
           fetch("volunteerNavbar.html")
@@ -204,7 +202,6 @@
       });
     </script>
     <script>
-      // Function to mark a pickup as completed
       async function markAsPickedUp(pickupId) {
         try {
           const userUid = localStorage.getItem("userUid");
@@ -217,12 +214,11 @@
           if (pickupSnapshot.exists()) {
             const pickup = pickupSnapshot.val();
 
-            // Fetch the original food post to get the manager's information
             const foodPostsRef = window.ref(window.database, "foodPosts");
             const foodPostsSnapshot = await window.get(foodPostsRef);
 
-            let managerId = "Unknown"; // Default value if not found
-            let originalFoodPostKey = null; // Track the key of the food post to update
+            let managerId = "Unknown";
+            let originalFoodPostKey = null;
 
             foodPostsSnapshot.forEach((childSnapshot) => {
               const foodPost = childSnapshot.val();
@@ -231,20 +227,18 @@
                 foodPost.expiryDate === pickup.expiryDate &&
                 foodPost.status === "ready to pickup"
               ) {
-                managerId = foodPost.managerId || "Unknown"; // Set the managerId
-                originalFoodPostKey = childSnapshot.key; // Store the key of the food post
+                managerId = foodPost.managerId || "Unknown";
+                originalFoodPostKey = childSnapshot.key;
               }
             });
 
             if (originalFoodPostKey) {
-              // Update the status of the food post to 'donated'
               const foodPostToUpdateRef = window.ref(
                 window.database,
                 `foodPosts/${originalFoodPostKey}`
               );
               await window.update(foodPostToUpdateRef, { status: "donated" });
 
-              // Move the item to the "donations" database
               const donationsRef = ref(database, "donations");
               const newDonationRef = push(donationsRef);
               await set(newDonationRef, {
@@ -256,14 +250,12 @@
                 status: "donated",
               });
 
-              // Update the pickup status to 'completed' instead of removing it
               await window.update(pickupRef, { status: "completed" });
 
               localStorage.setItem(
                 "notificationMessage",
                 "Item picked up and marked as donated!"
               );
-              // Post a notification using the function from notifications.js
               postNotification(
                 managerId,
                 `${pickup.quantity} ${pickup.itemName} have been Donated.`,
@@ -276,17 +268,13 @@
                 managerId,
                 pickup.itemName
               );
-              // Store manager ID in localStorage to use in feedback form
               localStorage.setItem("feedbackManagerId", managerId);
               localStorage.setItem("feedbackItemName", pickup.itemName);
 
-              window.fetchPickupSchedule(); // Refresh the pickup schedule
-              // Redirect to the feedback page
+              window.fetchPickupSchedule();
               window.location.href = "volunteerFeedback.html";
             } else {
-              console.error(
-                "No matching food post data found for this pickup."
-              );
+              console.error("No matching food post data found for this pickup.");
             }
           } else {
             console.error("No pickup data found.");
@@ -297,7 +285,6 @@
         }
       }
 
-      // Make `markAsPickedUp` globally available
       window.markAsPickedUp = markAsPickedUp;
 
       function signOut() {
