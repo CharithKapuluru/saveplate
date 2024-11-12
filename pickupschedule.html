@@ -3,114 +3,316 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pickup Schedule</title>
+    <title>Food Posts</title>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="main.css" />
     <style>
-      /* Background color adjusted for improved contrast */
       body {
-        /* Changed to a lighter gradient for better contrast with text */
-        background: linear-gradient(to bottom, #f0f7f2, #ffffff);
-        color: #1a1a1a; /* Darkened base text color for better contrast */
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
         font-family: "Arial", sans-serif;
       }
-
-      .pickups-container {
-        max-width: 800px;
+      .posts-container {
+        max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
       }
-
-      .pickup-card {
-        /* Changed to white background for maximum contrast */
-        background: #ffffff;
-        color: #1a1a1a;
-        border: 1px solid #2c5726;
+      .post-card {
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
         border-radius: 12px;
         padding: 20px;
         width: 100%;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s, box-shadow 0.3s;
       }
-
-      .pickup-card:hover {
+      .post-card:hover {
         transform: translateY(-5px);
         box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
       }
-
-      /* Header text adjusted for improved contrast */
-      .pickup-title {
+      .post-title {
         font-size: 1.8rem;
-        color: #1c3518; /* Darkened green for better contrast */
+        color: #4e7d16;
         font-weight: bold;
         margin-bottom: 0.5rem;
       }
-
-      .pickup-details {
+      .post-subtitle,
+      .post-available-by {
         font-size: 1.2rem;
-        color: #1a1a1a; /* Dark color for high contrast */
+        color: #2d3748;
         margin-bottom: 1rem;
       }
-
-      /* Button contrast improved */
-      .pickedup-button {
-        background-color: #1c3518; /* Darker green for better contrast */
-        color: #ffffff;
+      .pickup-button {
+        background-color: #4e7d16;
+        color: white;
         padding: 10px 20px;
         border-radius: 8px;
         transition: background-color 0.3s, transform 0.3s;
       }
-
-      .pickedup-button:hover {
-        background-color: #142611;
+      .pickup-button:hover {
+        background-color: #3b6b14;
         transform: translateY(-3px);
       }
-
-      /* Text color for headers improved */
-      .text-green-700 {
-        color: #1c3518; /* Darkened green for headers that meets AAA contrast */
+      .pickup-button:disabled {
+        background-color: #b0b0b0; /* Gray color to indicate it's disabled */
+        cursor: not-allowed; /* Change cursor to indicate disabled state */
+        transform: none; /* Remove any hover transformation */
       }
 
-      .text-center {
-        text-align: center;
+      .disabled-button {
+        background-color: #b0b0b0; /* Gray background to indicate it's been disabled */
+        cursor: not-allowed;
+        transform: none;
       }
     </style>
   </head>
-  <body class="min-h-screen">
-    <!-- Navbar - Darkened for better contrast -->
-    <header class="bg-[#1c3518] text-white py-4">
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
       </div>
     </header>
 
-    <!-- Rest of your HTML remains the same -->
-    <div class="pickups-container">
-      <h1 class="text-3xl font-bold mb-6 text-center text-[#1c3518]">
-        My Pickup Schedule
+    <!-- Food Posts Content -->
+    <div class="posts-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
+        Available Food Posts
       </h1>
 
-      <h2 class="text-2xl font-bold mb-4 text-[#1c3518]">Upcoming Pickups</h2>
-      <div id="upcomingPickupList" class="space-y-6">
-        <!-- Upcoming pickups will be dynamically inserted here -->
-      </div>
-
-      <h2 class="text-2xl font-bold mb-4 text-[#1c3518]">Completed Pickups</h2>
-      <div id="completedPickupList" class="space-y-6">
-        <!-- Completed pickups will be dynamically inserted here -->
+      <div id="foodPosts" class="space-y-6">
+        <!-- Food post cards will be dynamically inserted here -->
       </div>
     </div>
 
-    <!-- Your existing scripts remain unchanged -->
     <script type="module">
-      // Your existing JavaScript code remains unchanged
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+        update,
+        push,
+        set,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { showToast } from "./notification.js";
+      import { postNotification } from "./notifications.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Fetch food posts from Firebase and display them as cards
+      // Fetch food posts from Firebase and display them as cards
+      async function fetchFoodPosts() {
+        try {
+          const dbRef = ref(database);
+          const snapshot = await get(child(dbRef, `foodPosts`));
+          const foodPostsContainer = document.getElementById("foodPosts");
+          foodPostsContainer.innerHTML = ""; // Clear existing posts
+
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const foodPost = childSnapshot.val();
+
+              // Only display items that are not marked as "donated"
+              if (foodPost.status !== "donated") {
+                const postCard = document.createElement("div");
+                postCard.classList.add("post-card");
+
+                const pickupButtonId = `pickup-${childSnapshot.key}`;
+                const messageButtonId = `message-${childSnapshot.key}`;
+                postCard.innerHTML = `
+                  <h2 class="post-title">${foodPost.name}</h2>
+                  <p class="post-subtitle">Quantity: ${foodPost.quantity}</p>
+                  <p class="post-available-by">Available By: ${
+                    foodPost.expiryDate
+                  }</p>
+                  <button id="${pickupButtonId}" class="pickup-button">${
+                  foodPost.status === "available" ? "Pickup" : "Ready to Pickup"
+                }</button>
+                  <button id="${messageButtonId}" class="pickup-button">Message</button>
+                `;
+
+                foodPostsContainer.appendChild(postCard);
+
+                const pickupButton = document.getElementById(pickupButtonId);
+
+                // Add an event listener to the message button
+                const messageButton = document.getElementById(messageButtonId);
+
+                if (foodPost.status === "available") {
+                  // Enable button and add event listener if the item is available
+                  pickupButton.disabled = false;
+                  pickupButton.addEventListener("click", async () => {
+                    await pickupItem(childSnapshot.key, pickupButton);
+                  });
+                  messageButton.addEventListener("click", () => {
+                    localStorage.setItem(
+                      "selectedManagerId",
+                      foodPost.managerId
+                    );
+                    window.location.href = "messaging.html"; // Redirect to the messaging page
+                  });
+                } else if (foodPost.status === "ready to pickup") {
+                  // Disable button if the item is already ready for pickup
+                  pickupButton.disabled = true;
+                  pickupButton.classList.add("disabled-button");
+                  messageButton.addEventListener("click", () => {
+                    localStorage.setItem(
+                      "selectedManagerId",
+                      foodPost.managerId
+                    );
+                    window.location.href = "messaging.html"; // Redirect to the messaging page
+                  });
+                }
+                // Add an event listener to the message button for both states
+                messageButton.addEventListener("click", () => {
+                  // Save manager ID in localStorage to initiate a conversation
+                  localStorage.setItem("selectedManagerId", foodPost.managerId);
+                  window.location.href = "messaging.html"; // Redirect to the messaging page
+                });
+              }
+            });
+          } else {
+            console.log("No food posts available.");
+            foodPostsContainer.innerHTML = `<p class="text-center text-gray-700">No food posts available at the moment.</p>`;
+          }
+        } catch (error) {
+          console.error("Error fetching food posts: ", error);
+        }
+      }
+
+      // Function to mark an item as picked up and add it to pickup schedule
+      async function pickupItem(itemId, pickupButton) {
+        try {
+          const postRef = ref(database, `foodPosts/${itemId}`);
+          const snapshot = await get(postRef);
+          if (snapshot.exists()) {
+            const foodPost = snapshot.val();
+            const userUid = localStorage.getItem("userUid");
+
+            // Ensure the userUid is available
+            if (!userUid) {
+              alert("Unable to retrieve user ID. Please log in again.");
+              return;
+            }
+
+            // Store pickup information under user's pickups
+            const pickupRef = ref(database, `pickups/${userUid}`);
+            const newPickupRef = push(pickupRef);
+            await set(newPickupRef, {
+              itemName: foodPost.name,
+              quantity: foodPost.quantity,
+              expiryDate: foodPost.expiryDate,
+              managerId: foodPost.managerId, // Store manager ID
+              volunteerId: userUid, // Store volunteer ID
+              status: "upcoming",
+            });
+
+            // Update the status of the food post
+            await update(postRef, { status: "ready to pickup" });
+
+            // Update the button to show the new status and disable it
+            pickupButton.textContent = "Ready to Pickup";
+            pickupButton.disabled = true;
+            pickupButton.classList.add("disabled-button");
+
+            localStorage.setItem(
+              "notificationMessage",
+              "Item added to your pickup schedule!"
+            );
+            // Post a notification using the function from notifications.js
+            await postNotification(
+              userUid,
+              `${foodPost.name} is added to you pickup Schedule.`,
+              foodPost.managerId,
+              foodPost.name
+            );
+
+            const userRef = ref(database, `users/${userUid}`);
+            const userSnapshot = await get(userRef);
+
+            if (userSnapshot.exists()) {
+              const userName = userSnapshot.val().name;
+
+              await postNotification(
+                foodPost.managerId,
+                `${userName} is ready to pickup ${foodPost.name} for donation.`,
+                userUid,
+                foodPost.name
+              );
+            } else {
+              console.error("Failed to fetch user name for notification.");
+            }
+
+            // Redirect to the pickup schedule page
+            window.location.href = "pickupschedule.html";
+          }
+        } catch (error) {
+          console.error("Error picking up item: ", error);
+          postNotification(
+            userUid,
+            `Failed to add the item ${foodPost.name} to pickup schedule.`,
+            foodPost.managerId,
+            foodPost.name
+          );
+        }
+      }
+
+      window.pickupItem = pickupItem;
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Fetch food posts on page load
+        await fetchFoodPosts();
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        }
+      });
     </script>
     <script>
-      // Your existing JavaScript code remains unchanged
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>
