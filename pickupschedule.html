@@ -10,54 +10,67 @@
     />
     <link rel="stylesheet" href="main.css" />
     <style>
+      /* Background color adjusted for improved contrast */
       body {
-        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
-        color: #1a1a1a; /* Increased contrast for body text */
+        background: linear-gradient(to bottom, #8bb296, #cfe9d6); /* Darkened slightly */
+        color: #0a0a0a; /* High contrast text */
         font-family: "Arial", sans-serif;
       }
+
       .pickups-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
       }
+
       .pickup-card {
-        background: linear-gradient(to bottom right, #d1e0e5, #a0bfcf); /* Updated colors for contrast */
-        color: #0a0a0a; /* Increased text contrast */
+        background: linear-gradient(to bottom right, #d4f0f2, #a5d9de); /* Darker background for contrast */
+        color: #0a0a0a;
         border-radius: 12px;
         padding: 20px;
         width: 100%;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s, box-shadow 0.3s;
       }
+
       .pickup-card:hover {
         transform: translateY(-5px);
         box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
       }
+
+      /* Header text adjusted for improved contrast */
       .pickup-title {
         font-size: 1.8rem;
-        color: #345b24; /* Updated for better contrast */
+        color: #2c5726; /* Darkened green */
         font-weight: bold;
         margin-bottom: 0.5rem;
       }
+
       .pickup-details {
         font-size: 1.2rem;
-        color: #0a0a0a; /* Increased contrast */
+        color: #1a1a1a; /* Darker color for high contrast */
         margin-bottom: 1rem;
       }
+
+      /* Button contrast improved */
       .pickedup-button {
-        background-color: #345b24; /* Darker green for better contrast */
+        background-color: #2c5726; /* Darker green for better contrast */
         color: #ffffff;
         padding: 10px 20px;
         border-radius: 8px;
         transition: background-color 0.3s, transform 0.3s;
       }
+
       .pickedup-button:hover {
-        background-color: #27481d;
+        background-color: #24471f;
         transform: translateY(-3px);
       }
+
+      /* Text color for headers improved */
       .text-green-700 {
-        color: #234c21; /* Darker green for better contrast */
+        color: #234c21; /* Darker green for headers */
       }
+
       .text-center {
         text-align: center;
       }
@@ -65,7 +78,7 @@
   </head>
   <body class="bg-green-100 min-h-screen">
     <!-- Navbar -->
-    <header class="bg-green-700 text-white py-4">
+    <header class="bg-green-800 text-white py-4"> <!-- Darker navbar background for contrast -->
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
