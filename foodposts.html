@@ -3,259 +3,316 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food Posts - SavePlate</title>
+    <title>Food Posts</title>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
     <style>
-      :root {
-        --primary-dark: #065f46;  /* Dark green for primary text */
-        --secondary-dark: #1a202c; /* Dark gray for secondary text */
-        --background-light: #ffffff; /* White background */
-        --accent-green: #065f46; /* Accessible green */
-        --disabled-gray: #6b7280; /* Accessible gray */
-      }
-
       body {
-        background: #ffffff;
-        color: var(--secondary-dark);
+        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        color: #1a202c;
         font-family: "Arial", sans-serif;
       }
-
       .posts-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
       }
-
       .post-card {
-        background: var(--background-light);
-        color: var(--secondary-dark);
-        border: 1px solid #e5e7eb;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+        color: #1a202c;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
       }
-
       .post-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
       }
-
       .post-title {
-        font-size: 1.5rem;
-        color: var(--primary-dark);
+        font-size: 1.8rem;
+        color: #4e7d16;
         font-weight: bold;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
       }
-
       .post-subtitle,
       .post-available-by {
-        font-size: 1.125rem;
-        color: var(--secondary-dark);
-        margin-bottom: 0.75rem;
-        line-height: 1.5;
+        font-size: 1.2rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
       }
-
       .pickup-button {
-        background-color: var(--accent-green);
+        background-color: #4e7d16;
         color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 500;
-        transition: background-color 0.2s ease;
-        margin-right: 1rem;
-        border: 2px solid transparent;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
       }
-
-      .pickup-button:hover:not(:disabled) {
-        background-color: #064e3b;
+      .pickup-button:hover {
+        background-color: #3b6b14;
+        transform: translateY(-3px);
       }
-
-      .pickup-button:focus {
-        outline: 2px solid #064e3b;
-        outline-offset: 2px;
-      }
-
       .pickup-button:disabled {
-        background-color: var(--disabled-gray);
+        background-color: #b0b0b0; /* Gray color to indicate it's disabled */
+        cursor: not-allowed; /* Change cursor to indicate disabled state */
+        transform: none; /* Remove any hover transformation */
+      }
+
+      .disabled-button {
+        background-color: #b0b0b0; /* Gray background to indicate it's been disabled */
         cursor: not-allowed;
-      }
-
-      /* Ensure proper focus visibility */
-      *:focus {
-        outline: 2px solid #064e3b;
-        outline-offset: 2px;
-      }
-
-      /* Header styles */
-      .site-header {
-        background-color: var(--accent-green);
-        color: white;
-        padding: 1rem 0;
-      }
-
-      .header-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      /* Skip to main content link */
-      .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 0;
-        background: var(--accent-green);
-        color: white;
-        padding: 8px;
-        z-index: 100;
-      }
-
-      .skip-link:focus {
-        top: 0;
+        transform: none;
       }
     </style>
   </head>
-  <body>
-    <!-- Skip to main content link -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <!-- Header -->
-    <header class="site-header" role="banner">
-      <div class="header-content">
-        <h1 class="text-2xl font-bold">SavePlate</h1>
-        <div id="navbar-container" role="navigation"></div>
+  <body class="bg-green-100 min-h-screen">
+    <!-- Navbar -->
+    <header class="bg-green-700 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <div id="navbar-container"></div>
       </div>
     </header>
 
-    <!-- Main content -->
-    <main id="main-content" class="posts-container" role="main">
-      <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--primary-dark)">
+    <!-- Food Posts Content -->
+    <div class="posts-container">
+      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
         Available Food Posts
-      </h2>
+      </h1>
 
-      <div id="foodPosts" class="space-y-6" role="list">
-        <!-- Food posts will be dynamically inserted here -->
+      <div id="foodPosts" class="space-y-6">
+        <!-- Food post cards will be dynamically inserted here -->
       </div>
-    </main>
-
-    <!-- Loading indicator -->
-    <div id="loading-indicator" class="text-center hidden" role="alert" aria-live="polite">
-      Loading food posts...
     </div>
 
-    <!-- Error message container -->
-    <div id="error-message" class="text-center text-red-700 hidden" role="alert" aria-live="assertive"></div>
-
     <script type="module">
-      // [Previous Firebase imports and config remain the same]
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+        update,
+        push,
+        set,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { showToast } from "./notification.js";
+      import { postNotification } from "./notifications.js";
 
-      function createAccessibleCard(foodPost, postId) {
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        card.setAttribute('role', 'listitem');
-        
-        const pickupButtonId = `pickup-${postId}`;
-        const messageButtonId = `message-${postId}`;
-        
-        card.innerHTML = `
-          <h3 class="post-title">${foodPost.name}</h3>
-          <div class="post-details">
-            <p class="post-subtitle">
-              <span class="font-medium">Quantity:</span> 
-              <span>${foodPost.quantity}</span>
-            </p>
-            <p class="post-available-by">
-              <span class="font-medium">Available Until:</span>
-              <span>${foodPost.expiryDate}</span>
-            </p>
-          </div>
-          <div class="button-group mt-4">
-            <button 
-              id="${pickupButtonId}"
-              class="pickup-button"
-              aria-label="${foodPost.status === 'available' ? 'Pickup ' + foodPost.name : 'Already scheduled for pickup'}"
-              ${foodPost.status !== 'available' ? 'disabled' : ''}
-            >
-              ${foodPost.status === 'available' ? 'Pickup' : 'Ready to Pickup'}
-            </button>
-            <button 
-              id="${messageButtonId}"
-              class="pickup-button"
-              aria-label="Message about ${foodPost.name}"
-            >
-              Message
-            </button>
-          </div>
-        `;
-        
-        return card;
-      }
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDdZDK-BrKpSA-BIzPory1HG9Kljr3m7PI",
+        authDomain: "saveplate-c246d.firebaseapp.com",
+        projectId: "saveplate-c246d",
+        storageBucket: "saveplate-c246d.firebasestorage.app",
+        messagingSenderId: "120081276324",
+        appId: "1:120081276324:web:16985cfc7662a80502b531",
+        measurementId: "G-75P3TNTKK7",
+        databaseURL: "https://saveplate-c246d-default-rtdb.firebaseio.com/",
+      };
 
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Fetch food posts from Firebase and display them as cards
+      // Fetch food posts from Firebase and display them as cards
       async function fetchFoodPosts() {
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const errorMessage = document.getElementById('error-message');
-        const foodPostsContainer = document.getElementById('foodPosts');
-        
         try {
-          loadingIndicator.classList.remove('hidden');
-          errorMessage.classList.add('hidden');
-          
           const dbRef = ref(database);
-          const snapshot = await get(child(dbRef, 'foodPosts'));
-          
-          foodPostsContainer.innerHTML = '';
-          
+          const snapshot = await get(child(dbRef, `foodPosts`));
+          const foodPostsContainer = document.getElementById("foodPosts");
+          foodPostsContainer.innerHTML = ""; // Clear existing posts
+
           if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
               const foodPost = childSnapshot.val();
-              if (foodPost.status !== 'donated') {
-                const card = createAccessibleCard(foodPost, childSnapshot.key);
-                foodPostsContainer.appendChild(card);
-                
-                // Add event listeners
-                setupCardEventListeners(childSnapshot.key, foodPost);
+
+              // Only display items that are not marked as "donated"
+              if (foodPost.status !== "donated") {
+                const postCard = document.createElement("div");
+                postCard.classList.add("post-card");
+
+                const pickupButtonId = `pickup-${childSnapshot.key}`;
+                const messageButtonId = `message-${childSnapshot.key}`;
+                postCard.innerHTML = `
+                  <h2 class="post-title">${foodPost.name}</h2>
+                  <p class="post-subtitle">Quantity: ${foodPost.quantity}</p>
+                  <p class="post-available-by">Available By: ${
+                    foodPost.expiryDate
+                  }</p>
+                  <button id="${pickupButtonId}" class="pickup-button">${
+                  foodPost.status === "available" ? "Pickup" : "Ready to Pickup"
+                }</button>
+                  <button id="${messageButtonId}" class="pickup-button">Message</button>
+                `;
+
+                foodPostsContainer.appendChild(postCard);
+
+                const pickupButton = document.getElementById(pickupButtonId);
+
+                // Add an event listener to the message button
+                const messageButton = document.getElementById(messageButtonId);
+
+                if (foodPost.status === "available") {
+                  // Enable button and add event listener if the item is available
+                  pickupButton.disabled = false;
+                  pickupButton.addEventListener("click", async () => {
+                    await pickupItem(childSnapshot.key, pickupButton);
+                  });
+                  messageButton.addEventListener("click", () => {
+                    localStorage.setItem(
+                      "selectedManagerId",
+                      foodPost.managerId
+                    );
+                    window.location.href = "messaging.html"; // Redirect to the messaging page
+                  });
+                } else if (foodPost.status === "ready to pickup") {
+                  // Disable button if the item is already ready for pickup
+                  pickupButton.disabled = true;
+                  pickupButton.classList.add("disabled-button");
+                  messageButton.addEventListener("click", () => {
+                    localStorage.setItem(
+                      "selectedManagerId",
+                      foodPost.managerId
+                    );
+                    window.location.href = "messaging.html"; // Redirect to the messaging page
+                  });
+                }
+                // Add an event listener to the message button for both states
+                messageButton.addEventListener("click", () => {
+                  // Save manager ID in localStorage to initiate a conversation
+                  localStorage.setItem("selectedManagerId", foodPost.managerId);
+                  window.location.href = "messaging.html"; // Redirect to the messaging page
+                });
               }
             });
           } else {
-            foodPostsContainer.innerHTML = `
-              <p class="text-center text-gray-700" role="alert">
-                No food posts available at the moment.
-              </p>
-            `;
+            console.log("No food posts available.");
+            foodPostsContainer.innerHTML = `<p class="text-center text-gray-700">No food posts available at the moment.</p>`;
           }
         } catch (error) {
-          console.error('Error fetching food posts:', error);
-          errorMessage.textContent = 'Failed to load food posts. Please try again later.';
-          errorMessage.classList.remove('hidden');
-        } finally {
-          loadingIndicator.classList.add('hidden');
+          console.error("Error fetching food posts: ", error);
         }
       }
 
-      function setupCardEventListeners(postId, foodPost) {
-        const pickupButton = document.getElementById(`pickup-${postId}`);
-        const messageButton = document.getElementById(`message-${postId}`);
-        
-        if (foodPost.status === 'available') {
-          pickupButton.addEventListener('click', async () => {
-            await pickupItem(postId, pickupButton);
-          });
+      // Function to mark an item as picked up and add it to pickup schedule
+      async function pickupItem(itemId, pickupButton) {
+        try {
+          const postRef = ref(database, `foodPosts/${itemId}`);
+          const snapshot = await get(postRef);
+          if (snapshot.exists()) {
+            const foodPost = snapshot.val();
+            const userUid = localStorage.getItem("userUid");
+
+            // Ensure the userUid is available
+            if (!userUid) {
+              alert("Unable to retrieve user ID. Please log in again.");
+              return;
+            }
+
+            // Store pickup information under user's pickups
+            const pickupRef = ref(database, `pickups/${userUid}`);
+            const newPickupRef = push(pickupRef);
+            await set(newPickupRef, {
+              itemName: foodPost.name,
+              quantity: foodPost.quantity,
+              expiryDate: foodPost.expiryDate,
+              managerId: foodPost.managerId, // Store manager ID
+              volunteerId: userUid, // Store volunteer ID
+              status: "upcoming",
+            });
+
+            // Update the status of the food post
+            await update(postRef, { status: "ready to pickup" });
+
+            // Update the button to show the new status and disable it
+            pickupButton.textContent = "Ready to Pickup";
+            pickupButton.disabled = true;
+            pickupButton.classList.add("disabled-button");
+
+            localStorage.setItem(
+              "notificationMessage",
+              "Item added to your pickup schedule!"
+            );
+            // Post a notification using the function from notifications.js
+            await postNotification(
+              userUid,
+              `${foodPost.name} is added to you pickup Schedule.`,
+              foodPost.managerId,
+              foodPost.name
+            );
+
+            const userRef = ref(database, `users/${userUid}`);
+            const userSnapshot = await get(userRef);
+
+            if (userSnapshot.exists()) {
+              const userName = userSnapshot.val().name;
+
+              await postNotification(
+                foodPost.managerId,
+                `${userName} is ready to pickup ${foodPost.name} for donation.`,
+                userUid,
+                foodPost.name
+              );
+            } else {
+              console.error("Failed to fetch user name for notification.");
+            }
+
+            // Redirect to the pickup schedule page
+            window.location.href = "pickupschedule.html";
+          }
+        } catch (error) {
+          console.error("Error picking up item: ", error);
+          postNotification(
+            userUid,
+            `Failed to add the item ${foodPost.name} to pickup schedule.`,
+            foodPost.managerId,
+            foodPost.name
+          );
         }
-        
-        messageButton.addEventListener('click', () => {
-          localStorage.setItem('selectedManagerId', foodPost.managerId);
-          window.location.href = 'messaging.html';
-        });
       }
 
-      // [Rest of the JavaScript code remains similar, with added error handling and accessibility attributes]
+      window.pickupItem = pickupItem;
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Fetch food posts on page load
+        await fetchFoodPosts();
+
+        // Load the appropriate navbar for the volunteer
+        const userRole = localStorage.getItem("userRole");
+
+        if (userRole === "Volunteer") {
+          fetch("volunteerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        } else if (userRole === "Restaurant Manager") {
+          fetch("managerNavbar.html")
+            .then((response) => response.text())
+            .then((data) => {
+              document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch((error) => {
+              console.error("Error loading navbar: ", error);
+            });
+        }
+      });
+    </script>
+    <script>
+      function signOut() {
+        // Clear local storage and redirect to sign-in page
+        localStorage.clear();
+        alert("You have been signed out.");
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>
