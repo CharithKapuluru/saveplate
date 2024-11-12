@@ -10,8 +10,8 @@
     />
     <style>
       body {
-        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
-        color: #1a202c;
+        background: linear-gradient(to bottom, #a0c4a2, #cfe3d5); /* Increased contrast */
+        color: #0a1c2c; /* Darker text color for better contrast */
         font-family: "Arial", sans-serif;
       }
       .dashboard-overview {
@@ -22,13 +22,13 @@
       }
       .dashboard-overview h1 {
         font-size: 2.5rem;
-        color: #4e7d16;
+        color: #2d5116; /* Darker green for contrast */
         font-weight: bold;
         margin-bottom: 1rem;
       }
       .dashboard-overview p {
         font-size: 1.2rem;
-        color: #2d3748;
+        color: #2b3e50; /* Adjusted for contrast */
         margin-bottom: 2rem;
       }
       .overview-cards {
@@ -38,8 +38,8 @@
         gap: 1rem;
       }
       .card {
-        background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
-        color: #1a202c;
+        background: linear-gradient(to bottom right, #b2e3ea, #80cfd3); /* Darker blue gradient */
+        color: #0a1c2c; /* Dark text */
         border-radius: 12px;
         padding: 20px;
         width: 200px;
@@ -52,37 +52,41 @@
       }
       .card h2 {
         font-size: 1.5rem;
-        color: #4e7d16;
+        color: #1a4316; /* Darker green for contrast */
         font-weight: bold;
         margin-bottom: 1rem;
       }
       .card p {
         font-size: 1.25rem;
         font-weight: bold;
-        color: #1a202c;
+        color: #0a1c2c;
       }
       .btn-raise-request {
         display: inline-block;
-        margin-bottom: 20px;
+        background-color: #1a4316; /* Darker green for button */
+        color: #ffffff;
+        font-weight: bold;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
         transition: background-color 0.3s, transform 0.3s;
       }
-      #donationRequestModal.hidden {
-        display: none;
+      .btn-raise-request:hover {
+        background-color: #143314; /* Darker shade on hover */
+        transform: scale(1.05);
       }
-      /* Contrast updates for better accessibility */
       .nav-item {
-        color: #1b4332;
+        color: #184032; /* Darker green for contrast */
         font-weight: 600;
         padding: 0.75rem 1rem;
         transition: color 0.2s;
       }
       .nav-item:hover {
         color: #ffffff;
-        background-color: #1b4332;
+        background-color: #184032;
         border-radius: 0.375rem;
       }
       .sign-out-btn {
-        background-color: #1b4332;
+        background-color: #184032;
         color: #ffffff;
         padding: 0.75rem 1.5rem;
         border-radius: 0.375rem;
@@ -90,12 +94,31 @@
         transition: background-color 0.2s;
       }
       .sign-out-btn:hover {
-        background-color: #0f2c21;
+        background-color: #123523;
+      }
+      /* Modal and Form Adjustments for Contrast */
+      #donationRequestModal {
+        background: rgba(10, 28, 44, 0.85); /* Darker backdrop */
+      }
+      .modal-content {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+      }
+      .modal-content h2 {
+        color: #1a4316;
+      }
+      .modal-content label {
+        color: #0a1c2c;
+      }
+      .modal-content input {
+        color: #0a1c2c;
+        background-color: #e0e0e0;
       }
     </style>
   </head>
   <body class="bg-green-100 min-h-screen">
-    <header class="bg-green-700 text-white py-4">
+    <header class="bg-green-800 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <nav id="navbar-container"></nav>
@@ -110,7 +133,7 @@
       </p>
       <div class="flex justify-center">
         <button
-          class="btn-raise-request bg-green-700 text-white font-bold py-3 px-6 rounded-full mt-4 transition hover:bg-green-800 transform hover:scale-105"
+          class="btn-raise-request"
           onclick="openDonationRequestModal()"
           role="button"
         >
@@ -139,61 +162,47 @@
 
       <div
         id="donationRequestModal"
-        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center hidden"
+        class="fixed inset-0 flex items-center justify-center hidden"
       >
-        <div
-          class="bg-white rounded-lg p-8 max-w-lg w-full shadow-2xl transform transition-transform duration-300 scale-95 hover:scale-100"
-        >
-          <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">
+        <div class="modal-content max-w-lg w-full">
+          <h2 class="text-3xl font-bold mb-6 text-center">
             Raise a Donation Request
           </h2>
-          <form
-            id="donation-request-form"
-            onsubmit="submitDonationRequest(event)"
-          >
+          <form id="donation-request-form" onsubmit="submitDonationRequest(event)">
             <div class="mb-4">
-              <label
-                for="item"
-                class="block text-lg font-semibold text-gray-800 mb-2"
-              >
+              <label for="item" class="block text-lg font-semibold mb-2">
                 Food Item Needed
               </label>
               <input
                 type="text"
                 id="item"
-                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 transition"
                 placeholder="Enter the food item"
                 required
               />
             </div>
 
             <div class="mb-4">
-              <label
-                for="quantity"
-                class="block text-lg font-semibold text-gray-800 mb-2"
-              >
+              <label for="quantity" class="block text-lg font-semibold mb-2">
                 Quantity Needed
               </label>
               <input
                 type="number"
                 id="quantity"
-                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 transition"
                 placeholder="Enter quantity needed"
                 required
               />
             </div>
 
             <div class="mb-6">
-              <label
-                for="area"
-                class="block text-lg font-semibold text-gray-800 mb-2"
-              >
+              <label for="area" class="block text-lg font-semibold mb-2">
                 Area
               </label>
               <input
                 type="text"
                 id="area"
-                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
+                class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 transition"
                 placeholder="Enter your area"
                 required
               />
@@ -202,7 +211,7 @@
             <div class="flex items-center justify-between">
               <button
                 type="submit"
-                class="bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-green-800 focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transform transition hover:scale-105"
+                class="btn-raise-request"
                 role="button"
               >
                 Submit Request
@@ -223,14 +232,7 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-      import {
-        getDatabase,
-        ref,
-        get,
-        child,
-        push,
-        set,
-      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+      import { getDatabase, ref, get, child, push, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
       import { postNotification } from "./notifications.js";
 
       const firebaseConfig = {
@@ -296,13 +298,9 @@
           const dbRef = ref(database);
 
           const pickupsSnapshot = await get(child(dbRef, `pickups/${uid}`));
-          const totalPickups = pickupsSnapshot.exists()
-            ? Object.keys(pickupsSnapshot.val()).length
-            : 0;
+          const totalPickups = pickupsSnapshot.exists() ? Object.keys(pickupsSnapshot.val()).length : 0;
 
-          const donationRequestsSnapshot = await get(
-            child(dbRef, `donationRequests`)
-          );
+          const donationRequestsSnapshot = await get(child(dbRef, `donationRequests`));
           let totalDonationRequests = 0;
           if (donationRequestsSnapshot.exists()) {
             donationRequestsSnapshot.forEach((childSnapshot) => {
@@ -322,18 +320,12 @@
             });
           }
 
-          const notificationsSnapshot = await get(
-            child(dbRef, `notifications/${uid}`)
-          );
-          const totalAlerts = notificationsSnapshot.exists()
-            ? Object.keys(notificationsSnapshot.val()).length
-            : 0;
+          const notificationsSnapshot = await get(child(dbRef, `notifications/${uid}`));
+          const totalAlerts = notificationsSnapshot.exists() ? Object.keys(notificationsSnapshot.val()).length : 0;
 
           document.getElementById("totalPickups").textContent = totalPickups;
-          document.getElementById("totalDonationRequests").textContent =
-            totalDonationRequests;
-          document.getElementById("totalFeedbacks").textContent =
-            totalFeedbacks;
+          document.getElementById("totalDonationRequests").textContent = totalDonationRequests;
+          document.getElementById("totalFeedbacks").textContent = totalFeedbacks;
           document.getElementById("totalAlerts").textContent = totalAlerts;
         } catch (error) {
           console.error("Error fetching volunteer stats: ", error);
