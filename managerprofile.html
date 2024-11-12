@@ -108,138 +108,142 @@
     </script>
     <style>
       body {
-        background: linear-gradient(to bottom, #f9f7cf, #dcedc1);
-        color: #1a202c;
-        font-family: "Arial", sans-serif;
+        background: linear-gradient(to bottom, #A8D5BA, #DFF3E4);
         min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
       }
 
       .header {
-        background-color: #2E5B3D;
-      }
-
-      .nav-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .nav-link {
+        background-color: #2F5233;
         color: white;
-        padding: 0.5rem;
-        text-decoration: none;
-        transition: opacity 0.2s;
+        padding: 1rem 0;
       }
 
-      .nav-link:hover {
-        opacity: 0.8;
-      }
-
-      .sign-out-btn {
-        background-color: #234730;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        border: none;
-        cursor: pointer;
+      .content-wrapper {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
       }
 
       .profile-container {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 2rem;
         background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
 
       .profile-title {
-        color: #2E5B3D;
+        color: #2F5233;
         font-size: 2rem;
         font-weight: bold;
         text-align: center;
         margin-bottom: 2rem;
       }
 
-      .form-group {
-        margin-bottom: 1.5rem;
-      }
-
       .form-label {
         display: block;
-        color: #2E5B3D;
-        font-weight: 600;
+        color: #2F5233;
+        font-weight: 500;
         margin-bottom: 0.5rem;
       }
 
       .form-input {
         width: 100%;
         padding: 0.75rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        margin-bottom: 1rem;
         font-size: 1rem;
+        background-color: #F9FAFB;
       }
 
       .form-input:disabled {
-        background-color: #f3f4f6;
+        background-color: #F3F4F6;
+        color: #6B7280;
       }
 
       .form-input:focus {
         outline: none;
-        border-color: #2E5B3D;
-        box-shadow: 0 0 0 3px rgba(46, 91, 61, 0.1);
+        border-color: #2F5233;
+        box-shadow: 0 0 0 3px rgba(47, 82, 51, 0.1);
       }
 
       .save-button {
         width: 100%;
         padding: 0.75rem;
-        background-color: #2E5B3D;
+        background-color: #2F5233;
         color: white;
         border: none;
-        border-radius: 0.375rem;
+        border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
         transition: background-color 0.2s;
       }
 
       .save-button:hover {
-        background-color: #234730;
+        background-color: #234126;
+      }
+
+      .nav-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        transition: opacity 0.2s;
+      }
+
+      .nav-link:hover {
+        opacity: 0.9;
+      }
+
+      .sign-out-btn {
+        background-color: #439D44;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+      }
+
+      .sign-out-btn:hover {
+        background-color: #367C37;
       }
 
       .feedback-section {
         margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #E2E8F0;
       }
 
       .feedback-title {
-        color: #2E5B3D;
+        color: #2F5233;
         font-size: 1.5rem;
         font-weight: bold;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
       }
 
-      .feedback-container {
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
+      #feedback-list > div {
+        background-color: #F8FAFC;
+        border-radius: 8px;
         padding: 1rem;
-        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #E2E8F0;
       }
 
-      .feedback-text {
-        color: #1f2937;
-      }
-
-      .feedback-meta {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-top: 0.5rem;
+      .nav-container {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
       }
     </style>
   </head>
   <body>
-    <header class="header py-4">
+    <header class="header">
       <div class="container mx-auto px-4 flex justify-between items-center">
-        <h1 class="text-white text-2xl font-bold">Save Plate</h1>
-        <div id="navbar-container" class="nav-container">
+        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <nav class="nav-container">
           <a href="#" class="nav-link">Home</a>
           <a href="#" class="nav-link">Inventory</a>
           <a href="#" class="nav-link">Food Posting</a>
@@ -249,70 +253,71 @@
           <a href="#" class="nav-link">Profile</a>
           <a href="#" class="nav-link">Notifications</a>
           <button onclick="signOut()" class="sign-out-btn">Sign Out</button>
-        </div>
+        </nav>
       </div>
     </header>
 
-    <main class="profile-container">
-      <h2 class="profile-title">Restaurant Manager Profile</h2>
+    <div class="content-wrapper">
+      <main class="profile-container">
+        <h2 class="profile-title">Restaurant Manager Profile</h2>
 
-      <form id="profile-form" onsubmit="event.preventDefault(); saveProfile();">
-        <div class="form-group">
-          <label for="user-name" class="form-label">Name</label>
-          <input
-            type="text"
-            id="user-name"
-            class="form-input"
-            disabled
-          />
+        <form id="profile-form" onsubmit="event.preventDefault(); saveProfile();">
+          <div class="mb-4">
+            <label for="user-name" class="form-label">Name</label>
+            <input
+              type="text"
+              id="user-name"
+              class="form-input"
+              disabled
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="restaurant-name" class="form-label">Restaurant Name</label>
+            <input
+              type="text"
+              id="restaurant-name"
+              class="form-input"
+              required
+              placeholder="Enter restaurant name"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="contact-number" class="form-label">Contact Number</label>
+            <input
+              type="tel"
+              id="contact-number"
+              class="form-input"
+              required
+              pattern="[0-9]{10}"
+              placeholder="Enter contact number"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="restaurant-address" class="form-label">Restaurant Address</label>
+            <textarea
+              id="restaurant-address"
+              class="form-input"
+              rows="4"
+              required
+              placeholder="Enter restaurant address"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="save-button">
+            Save Profile
+          </button>
+        </form>
+
+        <div class="feedback-section">
+          <h3 class="feedback-title">Feedback Section</h3>
+          <div id="feedback-list">
+            <p class="text-gray-600">No feedback available yet.</p>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label for="restaurant-name" class="form-label">Restaurant Name</label>
-          <input
-            type="text"
-            id="restaurant-name"
-            class="form-input"
-            required
-            placeholder="Enter restaurant name"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="contact-number" class="form-label">Contact Number</label>
-          <input
-            type="tel"
-            id="contact-number"
-            class="form-input"
-            required
-            pattern="[0-9]{10}"
-            placeholder="Enter contact number"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="restaurant-address" class="form-label">Restaurant Address</label>
-          <textarea
-            id="restaurant-address"
-            class="form-input"
-            rows="4"
-            required
-            placeholder="Enter restaurant address"
-          ></textarea>
-        </div>
-
-        <button type="submit" class="save-button">
-          Save Profile
-        </button>
-      </form>
-
-      <div class="feedback-section">
-        <h3 class="feedback-title">Feedback Section</h3>
-        <div id="feedback-list">
-          <!-- Feedback items will be dynamically added here -->
-          <p class="text-gray-600">No feedback available yet.</p>
-        </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </body>
 </html>
