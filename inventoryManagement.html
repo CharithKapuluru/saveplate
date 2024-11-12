@@ -156,13 +156,11 @@
             <td class="border px-6 py-6 bg-[#dff3e4] text-gray-900 font-semibold shadow-lg">${item.expiryDate}</td>
             <td class="border px-6 py-6 bg-[#dff3e4] rounded-r-lg shadow-lg">
               <div class="flex space-x-3">
-                <button id="edit-${item.id}" class="btn bg-[#003300] text-white font-semibold hover:bg-[#001a00] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Edit</button>
-                <button id="delete-${item.id}" class="btn bg-[#003300] text-white font-semibold hover:bg-[#001a00] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Delete</button>
-                <button id="post-${item.id}" class="btn bg-[#003300] text-white font-semibold hover:bg-[#001a00] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Post</button>
+                <button id="edit-${item.id}" class="btn bg-[#006400] text-white font-semibold hover:bg-[#003200] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Edit</button>
+                <button id="delete-${item.id}" class="btn bg-[#8B0000] text-white font-semibold hover:bg-[#5a0000] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Delete</button>
+                <button id="post-${item.id}" class="btn bg-[#1E90FF] text-white font-semibold hover:bg-[#0f6bbf] font-bold py-2 px-6 rounded-full transition duration-300 transform hover:scale-110 shadow-md">Post</button>
               </div>
             </td>
-
-
           `;
           table.appendChild(row);
 
@@ -347,7 +345,7 @@
       }
 
       th {
-        background-color: #003300; /* Darker green shade */
+        background-color: #006400; /* Darker green shade */
         color: #ffffff;
         padding: 12px;
         border-radius: 10px 10px 0 0;
@@ -359,7 +357,7 @@
         color: #1a202c;
         padding: 20px;
         border-radius: 5px;
-        border: 1px solid #003300; /* Border color to match table consistency */
+        border: 1px solid #006400; /* Border color to match table consistency */
       }
 
       .btn {
@@ -414,7 +412,7 @@
     </style>
   </head>
   <body class="bg-green-100 min-h-screen">
-    <header class="bg-[#003300] text-white py-4">
+    <header class="bg-[#006400] text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">Save Plate</h1>
         <div id="navbar-container"></div>
@@ -428,7 +426,7 @@
       style="transition: all 0.3s ease-in-out"
     >
       <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg">
-        <h3 class="text-2xl font-bold mb-4 text-[#003300] text-center">
+        <h3 class="text-2xl font-bold mb-4 text-[#006400] text-center">
           + Add New Item
         </h3>
         <div class="mb-4">
@@ -438,7 +436,7 @@
           <input
             type="text"
             id="itemName"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#003300] focus:border-transparent"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#006400] focus:border-transparent"
             placeholder="Enter item name"
           />
         </div>
@@ -451,7 +449,7 @@
           <input
             type="number"
             id="itemQuantity"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#003300] focus:border-transparent"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#006400] focus:border-transparent"
             placeholder="Enter quantity"
           />
         </div>
@@ -464,7 +462,7 @@
           <input
             type="date"
             id="itemExpiryDate"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#003300] focus:border-transparent"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#006400] focus:border-transparent"
           />
         </div>
         <div class="flex justify-end space-x-4">
@@ -477,7 +475,7 @@
           <button
             id="saveItemButton"
             onclick="addItem()"
-            class="btn bg-[#003300] hover:bg-[#001a00] text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
+            class="btn bg-[#006400] hover:bg-[#003200] text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Add Item
           </button>
@@ -492,7 +490,7 @@
       style="transition: all 0.3s ease-in-out"
     >
       <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg">
-        <h3 class="text-2xl font-bold mb-4 text-[#003300] text-center">
+        <h3 class="text-2xl font-bold mb-4 text-[#006400] text-center">
           Post Item for Donation
         </h3>
         <div class="mb-4">
@@ -505,7 +503,7 @@
           <input
             type="number"
             id="postQuantity"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#003300] focus:border-transparent"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-[#006400] focus:border-transparent"
             placeholder="Enter quantity to post"
           />
         </div>
@@ -518,7 +516,7 @@
           </button>
           <button
             id="confirmPostButton"
-            class="btn bg-[#003300] hover:bg-[#001a00] text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
+            class="btn bg-[#006400] hover:bg-[#003200] text-white font-bold py-2 px-6 rounded-lg shadow-md transform transition duration-300 hover:scale-105"
           >
             Confirm Post
           </button>
@@ -534,7 +532,7 @@
         </h2>
         <button
           id="addItemButton"
-          class="bg-[#003300] hover:bg-[#001a00] text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105"
+          class="bg-[#006400] hover:bg-[#003200] text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105"
         >
           + Add New Item
         </button>
