@@ -42,23 +42,43 @@
         border-spacing: 0 15px;
         width: 100%;
         margin-top: 20px;
-        background-color: #F0FFF4;
       }
 
       th {
-        background-color: #276749; /* Darker green for better contrast */
+        background-color: #004d00;
         color: #ffffff;
         padding: 12px;
-        border-radius: 10px 10px 0 0;
         text-align: left;
+        font-weight: 600;
+      }
+
+      th:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+      }
+
+      th:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+
+      tr {
+        margin-bottom: 1rem;
       }
 
       td {
+        padding: 1rem;
         background-color: #ffffff;
-        color: #1a202c;
-        padding: 20px;
-        border-radius: 5px;
-        border: 1px solid #2F855A;
+      }
+
+      td:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+      }
+
+      td:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
       }
 
       .btn-delete {
@@ -104,23 +124,23 @@
   <body class="min-h-screen">
     <header class="text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <h1 class="text-2xl font-bold" style="background-color= #000; color: #fff;">Save Plate</h1>
         <div id="navbar-container"></div>
       </div>
     </header>
 
     <div class="waste-container mx-auto py-8">
-      <h1 class="text-3xl font-bold mb-4 text-heading text-center">
+      <h1 class="text-3xl font-bold mb-4 text-heading text-center" style="background-color= #000; color: #fff;">
         Waste Logging
       </h1>
-      <p class="mb-6 text-content text-center">
+      <p class="mb-6 text-content text-center" style="background-color= #000; color: #fff;">
         Log discarded food items by recording quantities and reasons for
         disposal.
       </p>
 
       <form id="waste-log-form" onsubmit="logWaste(event)" class="space-y-6">
         <div>
-          <label for="item_id" class="block text-sm font-medium form-label"
+          <label for="item_id" class="block text-sm font-medium form-label" style="color: #fff;"
             >Select Item</label
           >
           <select
@@ -134,7 +154,7 @@
         </div>
 
         <div>
-          <label for="quantity" class="block text-sm font-medium form-label"
+          <label for="quantity" class="block text-sm font-medium form-label" style="color: #fff;"
             >Quantity</label
           >
           <input
@@ -148,7 +168,7 @@
         </div>
 
         <div>
-          <label for="reason" class="block text-sm font-medium form-label"
+          <label for="reason" class="block text-sm font-medium form-label" style="color: #fff;"
             >Reason for Disposal</label
           >
           <textarea
@@ -165,9 +185,9 @@
       </form>
 
       <div class="waste-log-table-container mx-auto mt-10">
-        <h2 class="text-2xl font-semibold mb-4 text-heading text-center">Historical Waste Logs</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-heading text-center" style="background-color= #000; color: #fff;">Historical Waste Logs</h2>
         <div class="overflow-x-auto">
-          <table class="min-w-full rounded-lg shadow-lg">
+          <table class="min-w-full">
             <thead>
               <tr>
                 <th>Item</th>
