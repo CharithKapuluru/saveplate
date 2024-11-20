@@ -10,10 +10,11 @@
     />
     <style>
       body {
-        background: linear-gradient(to bottom, #a8d5ba, #dff3e4);
+        background: #e6f7e9; /* Lighter background for consistent contrast */
         color: #1a202c;
         font-family: "Arial", sans-serif;
       }
+
       .posts-container {
         max-width: 1000px;
         margin: 0 auto;
@@ -72,16 +73,17 @@
     <!-- Navbar -->
     <header class="bg-green-700 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <h1 class="text-2xl font-bold" style="color: #000000;">Save Plate</h1>
         <div id="navbar-container"></div>
       </div>
     </header>
 
     <!-- Food Posts Content -->
     <div class="posts-container">
-      <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
-        Available Food Posts
-      </h1>
+      <h1 class="text-3xl font-bold mb-6 text-center" style="color: #004d00;">
+  Available Food Posts
+</h1>
+
 
       <div id="foodPosts" class="space-y-6">
         <!-- Food post cards will be dynamically inserted here -->
