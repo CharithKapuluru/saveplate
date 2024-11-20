@@ -475,25 +475,25 @@
       }
     </style>
   </head>
-  <body class="bg-green-100 min-h-screen">
-    <header class="bg-green-700 text-white py-4">
+    <body class="bg-light-green min-h-screen" style="background: #e6f7e9; color: #1a202c; font-family: 'Arial', sans-serif;">
+    <header class="bg-dark-green text-white py-4">
       <div class="container mx-auto flex justify-between items-center px-4">
-        <h1 class="text-2xl font-bold">Save Plate</h1>
+        <h1 class="text-2xl font-bold" style="color: #000000;">Save Plate</h1>
         <div id="navbar-container"></div>
       </div>
     </header>
-
+  
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-400">Inventory Management</h2>
+        <h2 class="text-3xl font-bold" style="color: #000000;">Inventory Management</h2>
         <button
           id="addItemButton"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+          class="bg-dark-gray hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
         >
           + Add New Item
         </button>
       </div>
-
+  
       <div class="inventory-container">
         <table class="w-full">
           <thead>
@@ -510,54 +510,54 @@
         </table>
       </div>
     </div>
-
+  
     <!-- Add Item Popup -->
     <div id="addItemPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div class="popup-content fade-in">
-        <h3 class="text-2xl font-bold mb-6 text-gray-400 text-center">Add New Item</h3>
+        <h3 class="text-2xl font-bold mb-6 text-center" style="color: #000000;">Add New Item</h3>
         <div class="space-y-4">
           <div>
-            <label for="itemName" class="block text-sm font-medium text-gray-200">Item Name</label>
+            <label for="itemName" class="block text-lg font-medium" style="color: #000000;">Item Name</label>
             <input type="text" id="itemName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
           </div>
           <div>
-            <label for="itemQuantity" class="block text-sm font-medium text-gray-400">Quantity</label>
+            <label for="itemQuantity" class="block text-lg font-medium" style="color: #000000;">Quantity</label>
             <input type="number" id="itemQuantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
           </div>
           <div>
-            <label for="itemExpiryDate" class="block text-sm font-medium text-gray-400">Expiry Date</label>
+            <label for="itemExpiryDate" class="block text-lg font-medium" style="color: #000000;">Expiry Date</label>
             <input type="date" id="itemExpiryDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200" />
           </div>
         </div>
         <div class="mt-6 flex justify-end space-x-4">
-          <button onclick="closeAddItemPopup()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+          <button onclick="closeAddItemPopup()" class="btn bg-dark-gray hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
             Cancel
           </button>
-          <button id="saveItemButton" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+          <button id="saveItemButton" class="btn bg-dark-gray hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
             Save
           </button>
         </div>
       </div>
     </div>
-
+  
     <!-- Post Item Popup -->
     <div id="postItemPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div class="popup-content fade-in">
-        <h3 class="text-2xl font-bold mb-6 text-gray-400 text-center">Post Item for Donation</h3>
+        <h3 class="text-2xl font-bold mb-6 text-center" style="color: #000000;">Post Item for Donation</h3>
         <div>
-          <label for="postQuantity" class="block text-sm font-medium text-gray-400">Quantity to Post</label>
-          <input 
-            type="number" 
-            id="postQuantity" 
+          <label for="postQuantity" class="block text-lg font-medium" style="color: #000000;">Quantity to Post</label>
+          <input
+            type="number"
+            id="postQuantity"
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 transition duration-200"
             min="1"
           />
         </div>
         <div class="mt-6 flex justify-end space-x-4">
-          <button onclick="closePostItemPopup()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+          <button onclick="closePostItemPopup()" class="btn bg-dark-gray hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
             Cancel
           </button>
-          <button id="confirmPostButton" class="btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
+          <button id="confirmPostButton" class="btn bg-dark-gray hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition duration-300">
             Confirm
           </button>
         </div>
