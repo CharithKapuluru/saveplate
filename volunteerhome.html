@@ -42,7 +42,7 @@ body {
         gap: 1rem;
       }
       .card {
-        background: linear-gradient(to bottom right, #ffffff, #e6f3f4);
+        background: linear-gradient(to bottom right, #000, #e6f3f4);
         color: #0a1414;
         border-radius: 12px;
         padding: 20px;
@@ -63,7 +63,7 @@ body {
       .card p {
         font-size: 1.25rem;
         font-weight: bold;
-        color: #0a1414;
+        color: #fff;
       }
       .btn-raise-request {
         display: inline-block;
@@ -123,14 +123,14 @@ body {
   <body class="min-h-screen">
     <header class="bg-green-900 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold" style="color: #0a0a0a;">Save Plate</h1> <!-- Update to dark color -->
+      <h1 class="text-2xl font-bold" style="background-color: #000; color: #fff;">Save Plate</h1>
         <nav id="navbar-container"></nav>
       </div>
     </header>
 
     <main class="dashboard-overview">
-      <h1>Volunteer Dashboard</h1>
-      <p>
+      <h1 style="background-color: #000; color: #fff;">Volunteer Dashboard</h1>
+      <p style="background-color: #000; color: #fff;">
         Welcome to your volunteer dashboard. Here's a quick overview of your
         current stats.
       </p>
@@ -147,19 +147,19 @@ body {
 
       <div class="overview-cards">
         <div class="card" role="region" aria-label="Total pickups statistics">
-          <h2>Total Pickups Done</h2>
+          <h2 style="background-color: #000; color: #fff;">Total Pickups Done</h2>
           <p id="totalPickups">0</p>
         </div>
         <div class="card" role="region" aria-label="Donation requests statistics">
-          <h2>Donation Requests Raised</h2>
+          <h2 style="background-color: #000; color: #fff;">Donation Requests Raised</h2>
           <p id="totalDonationRequests">0</p>
         </div>
         <div class="card" role="region" aria-label="Feedback statistics">
-          <h2>Total Feedbacks Given</h2>
+          <h2 style="background-color: #000; color: #fff;">Total Feedbacks Given</h2>
           <p id="totalFeedbacks">0</p>
         </div>
         <div class="card" role="region" aria-label="Alerts statistics">
-          <h2>Alerts and Notifications</h2>
+          <h2 style="background-color: #000; color: #fff;">Alerts and Notifications</h2>
           <p id="totalAlerts">0</p>
         </div>
       </div>
@@ -172,12 +172,12 @@ body {
         aria-modal="true"
       >
         <div class="modal-content max-w-lg w-full">
-          <h2 id="modalTitle" class="text-3xl font-bold mb-6 text-center">
+          <h2 id="modalTitle" class="text-3xl font-bold mb-6 text-center" style="background-color: #000; color: #fff;">
             Raise a Donation Request
           </h2>
           <form id="donation-request-form" onsubmit="submitDonationRequest(event)">
             <div class="mb-4">
-              <label for="item" class="block text-lg font-semibold mb-2">
+              <label for="item" class="block text-lg font-semibold mb-2" style="background-color: #000; color: #fff;">
                 Food Item Needed
               </label>
               <input
@@ -191,7 +191,7 @@ body {
             </div>
 
             <div class="mb-4">
-              <label for="quantity" class="block text-lg font-semibold mb-2">
+              <label for="quantity" class="block text-lg font-semibold mb-2" style="background-color: #000; color: #fff;">
                 Quantity Needed
               </label>
               <input
@@ -205,7 +205,7 @@ body {
             </div>
 
             <div class="mb-6">
-              <label for="area" class="block text-lg font-semibold mb-2">
+              <label for="area" class="block text-lg font-semibold mb-2" style="background-color: #000; color: #fff;">
                 Area
               </label>
               <input
