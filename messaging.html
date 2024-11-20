@@ -59,16 +59,19 @@
         <h2 class="text-2xl font-bold text-green-700">Conversation</h2>
         <div id="conversationArea" class="space-y-4"></div>
         <div class="message-box">
-          <input
-            type="text"
-            id="messageInput"
-            class="message-input"
-            placeholder="Type a message..."
-          />
-          <button id="sendButton" class="send-button" onclick="sendMessage()">
-            Send
-          </button>
-        </div>
+  <label for="messageInput" class="sr-only">Enter your message</label>
+  <input
+    type="text"
+    id="messageInput"
+    class="message-input"
+    placeholder="Type a message..."
+    aria-label="Enter your message"
+  />
+  <button id="sendButton" class="send-button" onclick="sendMessage()">
+    Send
+  </button>
+</div>
+
       </div>
     </div>
     <script type="module">
